@@ -1,4 +1,4 @@
-# 🍓🍄 Collecting Stock
+# Collecting Stock
 
 A web application for tracking and managing your berry and mushroom collections. Built with React TypeScript frontend and Node.js backend.
 
@@ -132,7 +132,7 @@ npm run preview
 4. **Add stock items**:
    - Choose between Berry 🍓 or Mushroom 🍄
    - Enter the species/variety name
-   - Specify quantity and unit (kg, g, or pieces)
+   - Specify quantity in grams (g)
    - Add the collection location
    - Optionally add notes
    - Click "Add Stock"

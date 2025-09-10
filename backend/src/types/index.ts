@@ -2,6 +2,7 @@ export interface User {
   id: string;
   name: string;
   createdAt: Date;
+  revenue: number;
 }
 
 export interface StockItem {
@@ -10,7 +11,8 @@ export interface StockItem {
   type: 'berry' | 'mushroom';
   species: string;
   quantity: number;
-  unit: 'kg' | 'g' | 'pieces';
+  unitPrice: number;
+  totalPrice: number;
   location: string;
   collectedAt: Date;
   notes?: string;
@@ -32,7 +34,7 @@ export interface CreateStockItemRequest {
   type: 'berry' | 'mushroom';
   species: string;
   quantity: number;
-  unit: 'kg' | 'g' | 'pieces';
+  unitPrice: number;
   location: string;
   notes?: string;
 }

@@ -1,0 +1,132 @@
+{
+  "app": {
+    "title": "Marjastus ja sienestys",
+    "subtitle": "Seuraa marjojen ja sienten keräilyäsi helposti",
+    "welcome": "Tervetuloa marjastus- ja sienestys seurantaan",
+    "welcomeDescription": "Jos sinulla on jo tili, siirrythän Keräilyt-sivulle hallinnoidaksesi marjastuksiasi ja sienilöytöjäsi. Muuten voit aloittaa keräilyseikkailujen tallentamisen ja seuraamisen käyttäjätilin luomisen jälkeen Keräilyt-sivulla."
+  },
+  "navigation": {
+    "home": "Koti",
+    "collections": "Keräilyt",
+    "goToCollections": "Siirry keräilyihin",
+    "goToHome": "Siirry kotiin"
+  },
+  "user": {
+    "createAccount": "Luo käyttäjätili",
+    "enterName": "Syötä nimesi",
+    "createAccountButton": "Luo tili",
+    "selectUser": "Valitse käyttäjä",
+    "selectUserPlaceholder": "Valitse käyttäjä...",
+    "selectActiveUser": "Valitse käyttäjä:",
+    "currentlyTracking": "Seurataan keräilyjä käyttäjälle:",
+    "refreshUsers": "Päivitä käyttäjät",
+    "addingItemsFor": "Lisätään keräilytuotteita käyttäjälle:"
+  },
+  "stock": {
+    "addItem": "Lisää keräilytuote",
+    "type": "Tyyppi",
+    "berry": "Marja",
+    "mushroom": "Sieni",
+    "species": "Laji",
+    "speciesRequired": "Laji *",
+    "quantity": "Määrä",
+    "quantityRequired": "Määrä (g) *",
+    "unitPrice": "Hinta",
+    "unitPriceRequired": "Hinta (€/kg) *",
+    "location": "Sijainti",
+    "locationRequired": "Sijainti *",
+    "notes": "Muistiinpanot",
+    "notesOptional": "Muistiinpanot (vapaaehtoinen)",
+    "addStockButton": "Lisää keräilytuote",
+    "yourCollections": "Sinun keräilysi",
+    "yourCollectionsFull": "Sinun marjastuksesi ja sienestyksesi",
+    "collectedOn": "Kerätty",
+    "totalValue": "Kokonaisarvo",
+    "noItems": "Keräilytuotteita ei löytynyt.",
+    "deleteItem": "Poista tämä keräilytuote",
+    "noUserSelected": "Käyttäjää ei valittu",
+    "selectUserToView": "Valitse käyttäjä nähdäksesi heidän keräilyhistoriansa.",
+    "showingCollectionsFor": "Näytetään keräilyjä käyttäjälle:",
+    "loadingCollections": "Ladataan keräilyjä...",
+    "noCollectionsYet": "Ei keräilyjä vielä",
+    "startAddingCollections": "Aloita marjojen ja sienten keräily!",
+    "quantityLabel": "Määrä:",
+    "unitPriceLabel": "Hinta:",
+    "totalPriceLabel": "Kokonaishinta:",
+    "locationLabel": "Sijainti:",
+    "collectedLabel": "Kerätty:",
+    "notesLabel": "Muistiinpanot:",
+    "confirmDelete": "Oletko varma, että haluat poistaa tämän keräilytuotteen?",
+    "totalItems": "Tuotteiden määrä",
+    "totalRevenue": "Kokonaistulot",
+    "refresh": "Päivitä",
+    "refreshing": "Päivitetään..."
+  },
+  "placeholders": {
+    "berrySpecies": "Valitse marjalaji...",
+    "mushroomSpecies": "Valitse sienilaji...",
+    "customSpecies": "Syötä oma laji...",
+    "quantity": " ",
+    "unitPrice": " ",
+    "location": "esim. Metsä järven lähellä",
+    "notes": "Mahdolliset lisätiedot..."
+  },
+  "species": {
+    "berries": {
+      "blueberry": "Mustikka",
+      "lingonberry": "Puolukka",
+      "cloudberry": "Lakka",
+      "strawberry": "Mansikka",
+      "raspberry": "Vadelma",
+      "blackberry": "Karhunvatukka",
+      "cranberry": "Karpalo",
+      "seabuckthorn": "Tyrni",
+      "rowan": "Pihlajanmarja",
+      "other": "Muu"
+    },
+    "mushrooms": {
+      "chanterelle": "Kantarelli",
+      "porcini": "Herkkutatti",
+      "yellowfoot": "Suppilovahvero",
+      "hedgehog": "Oravasieni",
+      "honeyMushroom": "Mesisieni",
+      "milkcap": "Rousku",
+      "brittlegill": "Haapakas",
+      "bolete": "Tatti",
+      "oyster": "Osterivinokas",
+      "other": "Muu"
+    }
+  },
+  "messages": {
+    "selectUserFirst": "Valitse ensin käyttäjä",
+    "allFieldsRequired": "Laji, määrä, hinta ja sijainti ovat pakollisia",
+    "quantityPositive": "Määrän täytyy olla positiivinen luku",
+    "unitPriceNonNegative": "Hinnan täytyy olla ei-negatiivinen luku",
+    "stockItemCreated": "Keräilytuote luotu onnistuneesti!",
+    "userCreated": "Käyttäjätili luotu onnistuneesti! Voit siirtyä Keräilyt-sivulle tallentamaan ja seuraamaan keräilyjäsi.",
+    "nameRequired": "Nimi on pakollinen",
+    "errorCreatingUser": "Virhe käyttäjätilin luomisessa",
+    "errorCreatingStock": "Virhe keräilytuotteen luomisessa",
+    "errorLoadingUsers": "Virhe käyttäjien lataamisessa",
+    "errorLoadingStock": "Virhe keräilytuotteiden lataamisessa",
+    "errorDeletingStock": "Virhe keräilytuotteen poistamisessa",
+    "failedToLoadStock": "Keräilytuotteiden lataaminen epäonnistui",
+    "failedToDeleteStock": "Keräilytuotteen poistaminen epäonnistui",
+    "loading": "Ladataan...",
+    "loadingUsers": "Ladataan käyttäjiä...",
+    "tryAgain": "Yritä uudelleen"
+  },
+  "units": {
+    "grams": "g",
+    "pricePerKg": "€/kg",
+    "currency": "€"
+  },
+  "common": {
+    "delete": "Poista",
+    "cancel": "Peruuta",
+    "confirm": "Vahvista",
+    "close": "Sulje",
+    "save": "Tallenna",
+    "edit": "Muokkaa"
+  }
+}

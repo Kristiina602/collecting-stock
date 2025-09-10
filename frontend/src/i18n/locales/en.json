@@ -1,0 +1,132 @@
+{
+  "app": {
+    "title": "Berries Pick and Mushrooms Collect",
+    "subtitle": "Track your berry and mushroom collections with ease",
+    "welcome": "Welcome to Berry & Mushroom Picking Monitoring",
+    "welcomeDescription": "If you already has account, please navigate to Collections to manage your berry pickings and mushroom finds. When not having account, please create your account and start tracking your foraging adventures."
+  },
+  "navigation": {
+    "home": "Home",
+    "collections": "Collections",
+    "goToCollections": "Go to Collections",
+    "goToHome": "Go to Home"
+  },
+  "user": {
+    "createAccount": "Create User Account",
+    "enterName": "Enter your name",
+    "createAccountButton": "Create Account",
+    "selectUser": "Select User",
+    "selectUserPlaceholder": "Choose a user...",
+    "selectActiveUser": "Select User:",
+    "currentlyTracking": "Currently tracking collections for:",
+    "refreshUsers": "Refresh Users",
+    "addingItemsFor": "Adding collecting items for:"
+  },
+  "stock": {
+    "addItem": "Add Collecting Item",
+    "type": "Type",
+    "berry": "Berry",
+    "mushroom": "Mushroom",
+    "species": "Species",
+    "speciesRequired": "Species *",
+    "quantity": "Quantity",
+    "quantityRequired": "Quantity (g) *",
+    "unitPrice": "Price ",
+    "unitPriceRequired": "Price (€/kg) *",
+    "location": "Location",
+    "locationRequired": "Location *",
+    "notes": "Notes",
+    "notesOptional": "Notes (optional)",
+    "addStockButton": "Add Collecting Item",
+    "yourCollections": "Your Collections",
+    "yourCollectionsFull": "Your Berry pickings and Mushroom collections",
+    "collectedOn": "Collected on",
+    "totalValue": "Total value",
+    "noItems": "No collecting items found.",
+    "deleteItem": "Delete this item",
+    "noUserSelected": "No User Selected",
+    "selectUserToView": "Select a user to view their collection history.",
+    "showingCollectionsFor": "Showing collections for:",
+    "loadingCollections": "Loading collections...",
+    "noCollectionsYet": "No Collections Yet",
+    "startAddingCollections": "Start adding your berry and mushroom collections!",
+    "quantityLabel": "Quantity:",
+    "unitPriceLabel": "Price:",
+    "totalPriceLabel": "Total Price:",
+    "locationLabel": "Location:",
+    "collectedLabel": "Collected:",
+    "notesLabel": "Notes:",
+    "confirmDelete": "Are you sure you want to delete this stock item?",
+    "totalItems": "Total Items",
+    "totalRevenue": "Total Revenue",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing..."
+  },
+  "placeholders": {
+    "berrySpecies": "Choose a berry species...",
+    "mushroomSpecies": "Choose a mushroom species...",
+    "customSpecies": "Enter custom species...",
+    "quantity": " ",
+    "unitPrice": " ",
+    "location": "e.g., Forest near lake",
+    "notes": "Any additional information..."
+  },
+  "species": {
+    "berries": {
+      "blueberry": "Blueberry",
+      "lingonberry": "Lingonberry",
+      "cloudberry": "Cloudberry",
+      "strawberry": "Strawberry",
+      "raspberry": "Raspberry",
+      "blackberry": "Blackberry",
+      "cranberry": "Cranberry",
+      "seabuckthorn": "Sea Buckthorn",
+      "rowan": "Rowan",
+      "other": "Other"
+    },
+    "mushrooms": {
+      "chanterelle": "Chanterelle",
+      "porcini": "Porcini",
+      "yellowfoot": "Yellowfoot Chanterelle",
+      "hedgehog": "Hedgehog Mushroom",
+      "honeyMushroom": "Honey Mushroom",
+      "milkcap": "Milk Cap",
+      "brittlegill": "Brittlegill",
+      "bolete": "Bolete",
+      "oyster": "Oyster Mushroom",
+      "other": "Other"
+    }
+  },
+  "messages": {
+    "selectUserFirst": "Please select a user first",
+    "allFieldsRequired": "Species, quantity, price, and location are required",
+    "quantityPositive": "Quantity must be a positive number",
+    "unitPriceNonNegative": "Price must be a non-negative number",
+    "stockItemCreated": "Collecting item created successfully!",
+    "userCreated": "User account created successfully! You can navigate to Collections to save and track your collections.",
+    "nameRequired": "Name is required",
+    "errorCreatingUser": "Error creating user account",
+    "errorCreatingStock": "Error creating collecting item",
+    "errorLoadingUsers": "Error loading users",
+    "errorLoadingStock": "Error loading collecting items",
+    "errorDeletingStock": "Error deleting collecting item",
+    "failedToLoadStock": "Failed to load stock items",
+    "failedToDeleteStock": "Failed to delete stock item",
+    "loading": "Loading...",
+    "loadingUsers": "Loading users...",
+    "tryAgain": "Try Again"
+  },
+  "units": {
+    "grams": "g",
+    "pricePerKg": "€/kg",
+    "currency": "€"
+  },
+  "common": {
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "save": "Save",
+    "edit": "Edit"
+  }
+}

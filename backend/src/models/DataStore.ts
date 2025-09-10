@@ -10,25 +10,45 @@ class DataStore {
     const user: User = {
       id: uuidv4(),
       name,
-      createdAt: new Date()
+      createdAt: new Date(),
+      revenue: 0
     };
     this.users.push(user);
     return user;
   }
 
   getUserById(id: string): User | undefined {
-    return this.users.find(user => user.id === id);
+    const user = this.users.find(user => user.id === id);
+    if (!user) return undefined;
+    
+    // Calculate current revenue from stock items
+    const userRevenue = this.stockItems
+      .filter(item => item.userId === id)
+      .reduce((total, item) => total + item.totalPrice, 0);
+    
+    return { ...user, revenue: userRevenue };
   }
 
   getAllUsers(): User[] {
-    return [...this.users];
+    return this.users.map(user => {
+      // Calculate current revenue from stock items
+      const userRevenue = this.stockItems
+        .filter(item => item.userId === user.id)
+        .reduce((total, item) => total + item.totalPrice, 0);
+      
+      return { ...user, revenue: userRevenue };
+    });
   }
 
   // Stock item operations
-  createStockItem(stockItemData: Omit<StockItem, 'id' | 'collectedAt'>): StockItem {
+  createStockItem(stockItemData: Omit<StockItem, 'id' | 'collectedAt' | 'totalPrice'>): StockItem {
+    // Calculate totalPrice from quantity and unitPrice
+    const totalPrice = (stockItemData.quantity * stockItemData.unitPrice)/1000;
+    
     const stockItem: StockItem = {
       id: uuidv4(),
       ...stockItemData,
+      totalPrice,
       collectedAt: new Date()
     };
     this.stockItems.push(stockItem);
@@ -47,12 +67,19 @@ class DataStore {
     return this.stockItems.find(item => item.id === id);
   }
 
-  updateStockItem(id: string, updates: Partial<Omit<StockItem, 'id' | 'userId' | 'collectedAt'>>): StockItem | null {
+  updateStockItem(id: string, updates: Partial<Omit<StockItem, 'id' | 'userId' | 'collectedAt' | 'totalPrice'>>): StockItem | null {
     const index = this.stockItems.findIndex(item => item.id === id);
     if (index === -1) return null;
 
-    this.stockItems[index] = { ...this.stockItems[index], ...updates };
-    return this.stockItems[index];
+    const updatedItem = { ...this.stockItems[index], ...updates };
+    
+    // Recalculate totalPrice if quantity or unitPrice changed
+    if ('quantity' in updates || 'unitPrice' in updates) {
+      updatedItem.totalPrice = updatedItem.quantity * updatedItem.unitPrice;
+    }
+    
+    this.stockItems[index] = updatedItem;
+    return updatedItem;
   }
 
   deleteStockItem(id: string): boolean {

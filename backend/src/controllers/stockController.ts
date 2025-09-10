@@ -4,13 +4,13 @@ import { ApiResponse, CreateStockItemRequest } from '../types';
 
 export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockItemRequest>, res: Response<ApiResponse<any>>) => {
   try {
-    const { userId, type, species, quantity, unit, location, notes } = req.body;
+    const { userId, type, species, quantity, unitPrice, location, notes } = req.body;
 
     // Validation
-    if (!userId || !type || !species || !quantity || !unit || !location) {
+    if (!userId || !type || !species || !quantity || unitPrice === undefined || !location) {
       return res.status(400).json({
         success: false,
-        error: 'All required fields must be provided: userId, type, species, quantity, unit, location'
+        error: 'All required fields must be provided: userId, type, species, quantity, unitPrice, location'
       });
     }
 
@@ -21,17 +21,17 @@ export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockIt
       });
     }
 
-    if (!['kg', 'g', 'pieces'].includes(unit)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Unit must be either "kg", "g", or "pieces"'
-      });
-    }
-
     if (quantity <= 0) {
       return res.status(400).json({
         success: false,
         error: 'Quantity must be greater than 0'
+      });
+    }
+
+    if (unitPrice < 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Unit price must be greater than or equal to 0'
       });
     }
 
@@ -49,7 +49,7 @@ export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockIt
       type,
       species: species.trim(),
       quantity,
-      unit,
+      unitPrice,
       location: location.trim(),
       notes: notes?.trim()
     });

@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { userApi } from '../services/api';
 import { User } from '../types';
 
 interface UserSelectorProps {
   selectedUser: User | null;
   onUserSelected: (user: User | null) => void;
+  onUsersRefreshed?: () => void;
 }
 
 export const UserSelector: React.FC<UserSelectorProps> = ({ 
   selectedUser, 
-  onUserSelected 
+  onUserSelected,
+  onUsersRefreshed 
 }) => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,8 +28,19 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
       setLoading(true);
       const fetchedUsers = await userApi.getAll();
       setUsers(fetchedUsers);
+      
+      // If a user is currently selected, update it with fresh data
+      if (selectedUser) {
+        const updatedUser = fetchedUsers.find(u => u.id === selectedUser.id);
+        if (updatedUser) {
+          onUserSelected(updatedUser);
+        }
+      }
+      
+      // Call the refresh callback if provided
+      onUsersRefreshed?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load users');
+      setError(err instanceof Error ? err.message : t('messages.errorLoadingUsers'));
     } finally {
       setLoading(false);
     }
@@ -54,7 +69,7 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
   }, []);
 
   if (loading) {
-    return <div className="user-select">Loading users...</div>;
+    return <div className="user-select">{t('messages.loadingUsers')}</div>;
   }
 
   if (error) {
@@ -62,7 +77,7 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
       <div className="user-select">
         <div className="error">{error}</div>
         <button className="btn btn-small" onClick={refreshUsers}>
-          Try Again
+          {t('messages.tryAgain')}
         </button>
       </div>
     );
@@ -70,7 +85,7 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
 
   return (
     <div className="user-select">
-      <label htmlFor="userSelect">Select Active User:</label>
+      <label htmlFor="userSelect">{t('user.selectActiveUser')}</label>
       <select
         id="userSelect"
         className="form-control"
@@ -78,7 +93,7 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
         onChange={handleUserChange}
         style={{ marginTop: '8px' }}
       >
-        <option value="">-- Select a user --</option>
+        <option value="">{t('user.selectUserPlaceholder')}</option>
         {users.map(user => (
           <option key={user.id} value={user.id}>
             {user.name}
@@ -87,9 +102,14 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
       </select>
       
       {selectedUser && (
-        <p style={{ marginTop: '10px' }}>
-          Currently tracking collections for: <span className="current-user">{selectedUser.name}</span>
-        </p>
+        <div style={{ marginTop: '10px' }}>
+          <p>
+            {t('user.currentlyTracking')} <span className="current-user">{selectedUser.name}</span>
+          </p>
+          <p style={{ color: '#065f46', fontWeight: 'bold' }}>
+            {t('stock.totalRevenue')}: {t('units.currency')}{selectedUser.revenue.toFixed(2)}
+          </p>
+        </div>
       )}
       
       <button 
@@ -97,7 +117,7 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
         onClick={refreshUsers}
         style={{ marginTop: '10px' }}
       >
-        Refresh Users
+        {t('user.refreshUsers')}
       </button>
     </div>
   );

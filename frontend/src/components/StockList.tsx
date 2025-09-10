@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { stockApi } from '../services/api';
 import { User, StockItem } from '../types';
+import { Icon } from './Icon';
 
 interface StockListProps {
   selectedUser: User | null;
@@ -11,6 +13,7 @@ export const StockList: React.FC<StockListProps> = ({
   selectedUser, 
   refreshTrigger 
 }) => {
+  const { t } = useTranslation();
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,14 +37,14 @@ export const StockList: React.FC<StockListProps> = ({
         new Date(b.collectedAt).getTime() - new Date(a.collectedAt).getTime()
       ));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load stock items');
+      setError(err instanceof Error ? err.message : t('messages.failedToLoadStock'));
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this stock item?')) {
+    if (!confirm(t('stock.confirmDelete'))) {
       return;
     }
 
@@ -49,7 +52,7 @@ export const StockList: React.FC<StockListProps> = ({
       await stockApi.delete(id);
       setStockItems(items => items.filter(item => item.id !== id));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete stock item');
+      setError(err instanceof Error ? err.message : t('messages.failedToDeleteStock'));
     }
   };
 
@@ -66,10 +69,12 @@ export const StockList: React.FC<StockListProps> = ({
   if (!selectedUser) {
     return (
       <div className="card">
-        <h2>📦 Your Collections</h2>
+        <h2>
+          {t('stock.yourCollections')}
+        </h2>
         <div className="empty-state">
-          <h3>No User Selected</h3>
-          <p>Select a user to view their collection history.</p>
+          <h3>{t('stock.noUserSelected')}</h3>
+          <p>{t('stock.selectUserToView')}</p>
         </div>
       </div>
     );
@@ -77,21 +82,23 @@ export const StockList: React.FC<StockListProps> = ({
 
   return (
     <div className="card">
-      <h2>📦 Your Collections</h2>
+      <h2>
+        {t('stock.yourCollections')}
+      </h2>
       <p style={{ marginBottom: '20px', color: '#718096' }}>
-        Showing collections for: <span className="current-user">{selectedUser.name}</span>
+        {t('stock.showingCollectionsFor')} <span className="current-user">{selectedUser.name}</span>
       </p>
       
       {error && <div className="error">{error}</div>}
       
       {loading ? (
         <div className="empty-state">
-          <p>Loading collections...</p>
+          <p>{t('stock.loadingCollections')}</p>
         </div>
       ) : stockItems.length === 0 ? (
         <div className="empty-state">
-          <h3>No Collections Yet</h3>
-          <p>Start adding your berry and mushroom collections!</p>
+          <h3>{t('stock.noCollectionsYet')}</h3>
+          <p>{t('stock.startAddingCollections')}</p>
         </div>
       ) : (
         <div className="stock-list">
@@ -102,21 +109,24 @@ export const StockList: React.FC<StockListProps> = ({
             >
               <div className="stock-item-info">
                 <h4>
-                  {item.type === 'berry' ? '🍓' : '🍄'} {item.species}
+                  {item.species}
                 </h4>
-                <p><strong>Quantity:</strong> {item.quantity} {item.unit}</p>
-                <p><strong>Location:</strong> {item.location}</p>
-                <p><strong>Collected:</strong> {formatDate(item.collectedAt)}</p>
-                {item.notes && <p><strong>Notes:</strong> {item.notes}</p>}
+                <p><strong>{t('stock.quantityLabel')}</strong> {item.quantity} {t('units.grams')}</p>
+                <p><strong>{t('stock.unitPriceLabel')}</strong> ${item.unitPrice.toFixed(2)}</p>
+                <p><strong>{t('stock.totalPriceLabel')}</strong> ${item.totalPrice.toFixed(2)}</p>
+                <p><strong>{t('stock.locationLabel')}</strong> {item.location}</p>
+                <p><strong>{t('stock.collectedLabel')}</strong> {formatDate(item.collectedAt)}</p>
+                {item.notes && <p><strong>{t('stock.notesLabel')}</strong> {item.notes}</p>}
               </div>
               
               <div className="stock-item-actions">
                 <button 
-                  className="btn btn-small btn-danger"
+                  className="btn btn-small btn-danger icon-with-text"
                   onClick={() => handleDelete(item.id)}
                   title="Delete this item"
                 >
-                  🗑️ Delete
+                  <Icon name="trash" size={14} />
+                  {t('common.delete')}
                 </button>
               </div>
             </div>
@@ -125,15 +135,40 @@ export const StockList: React.FC<StockListProps> = ({
       )}
       
       {stockItems.length > 0 && (
-        <div style={{ marginTop: '20px', textAlign: 'center' }}>
-          <button 
-            className="btn btn-secondary btn-small" 
-            onClick={loadStockItems}
-            disabled={loading}
-          >
-            {loading ? 'Refreshing...' : '🔄 Refresh'}
-          </button>
-        </div>
+        <>
+          <div style={{ 
+            marginTop: '20px', 
+            padding: '15px', 
+            backgroundColor: '#f7fafc', 
+            borderRadius: '6px',
+            border: '1px solid #e2e8f0'
+          }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', textAlign: 'center' }}>
+              <div>
+                <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('stock.totalItems')}</p>
+                <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px', color: '#2d3748' }}>
+                  {stockItems.length}
+                </p>
+              </div>
+              <div>
+                <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('stock.totalRevenue')}</p>
+                <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px', color: '#065f46' }}>
+                  ${stockItems.reduce((total, item) => total + item.totalPrice, 0).toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div style={{ marginTop: '15px', textAlign: 'center' }}>
+            <button 
+              className="btn btn-secondary btn-small icon-with-text" 
+              onClick={loadStockItems}
+              disabled={loading}
+            >
+              <Icon name="refresh" size={14} />
+              {loading ? t('stock.refreshing') : t('stock.refresh')}
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

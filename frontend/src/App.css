@@ -39,6 +39,79 @@ body {
   opacity: 0.9;
 }
 
+.navigation {
+  max-width: 1200px;
+  margin: 0 auto 30px auto;
+  padding: 0 20px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #4a5568;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.nav-link:hover {
+  background-color: #f7fafc;
+  color: #2d3748;
+}
+
+.nav-link.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
+.welcome-section {
+  max-width: 1200px;
+  margin: 0 auto 40px auto;
+  text-align: center;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-section h2 {
+  color: #2d3748;
+  margin-bottom: 15px;
+  font-size: 1.8rem;
+}
+
+.welcome-section p {
+  color: #718096;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.home-page .main-content {
+  display: block;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.collections-page .main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
 .main-content {
   max-width: 1200px;
   margin: 0 auto;
@@ -132,6 +205,13 @@ body {
   background: #e53e3e;
 }
 
+/* Container that matches navigation bar width */
+.user-selector-container {
+  max-width: 1200px;
+  margin: 0 auto 30px auto;
+  padding: 0 20px;
+}
+
 .user-select {
   margin-bottom: 20px;
   padding: 15px;
@@ -220,4 +300,42 @@ body {
 
 .mushroom {
   border-left-color: #d69e2e;
+}
+
+/* Icon styles */
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.icon.clickable {
+  cursor: pointer;
+}
+
+.icon.clickable:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+
+.icon-with-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Icon size utilities */
+.icon-small {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-medium {
+  width: 20px;
+  height: 20px;
+}
+
+.icon-large {
+  width: 24px;
+  height: 24px;
 }

@@ -1,42 +1,66 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { stockApi } from '../services/api';
-import { User, StockItem } from '../types';
+import { User } from '../types';
 
 interface StockFormProps {
   selectedUser: User | null;
-  onStockItemCreated: (stockItem: StockItem) => void;
+  onStockItemCreated: () => void;
 }
 
 export const StockForm: React.FC<StockFormProps> = ({ 
   selectedUser, 
   onStockItemCreated 
 }) => {
+  const { t } = useTranslation();
   const [type, setType] = useState<'berry' | 'mushroom'>('berry');
   const [species, setSpecies] = useState('');
+  const [customSpecies, setCustomSpecies] = useState('');
   const [quantity, setQuantity] = useState('');
-  const [unit, setUnit] = useState<'kg' | 'g' | 'pieces'>('kg');
+  const [unitPrice, setUnitPrice] = useState('');
   const [location, setLocation] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Get species options based on type
+  const getSpeciesOptions = () => {
+    const speciesKey = type === 'berry' ? 'berries' : 'mushrooms';
+    return Object.entries(t(`species.${speciesKey}`, { returnObjects: true }) as Record<string, string>);
+  };
+
+  // Get the final species value to use
+  const getFinalSpeciesValue = () => {
+    if (species === 'other') {
+      return customSpecies.trim();
+    }
+    return species ? t(`species.${type === 'berry' ? 'berries' : 'mushrooms'}.${species}`) : '';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!selectedUser) {
-      setError('Please select a user first');
+      setError(t('messages.selectUserFirst'));
       return;
     }
 
-    if (!species.trim() || !quantity || !location.trim()) {
-      setError('Species, quantity, and location are required');
+    const finalSpecies = getFinalSpeciesValue();
+    if (!finalSpecies || !quantity || !unitPrice || !location.trim()) {
+      setError(t('messages.allFieldsRequired'));
       return;
     }
 
     const quantityNum = parseFloat(quantity);
     if (isNaN(quantityNum) || quantityNum <= 0) {
-      setError('Quantity must be a positive number');
+      setError(t('messages.quantityPositive'));
+      return;
+    }
+
+    const unitPriceNum = parseFloat(unitPrice);
+    if (isNaN(unitPriceNum) || unitPriceNum < 0) {
+      setError(t('messages.unitPriceNonNegative'));
       return;
     }
 
@@ -45,27 +69,29 @@ export const StockForm: React.FC<StockFormProps> = ({
     setSuccess(null);
 
     try {
-      const stockItem = await stockApi.create({
+      await stockApi.create({
         userId: selectedUser.id,
         type,
-        species: species.trim(),
+        species: finalSpecies,
         quantity: quantityNum,
-        unit,
+        unitPrice: unitPriceNum,
         location: location.trim(),
         notes: notes.trim() || undefined,
       });
 
-      setSuccess(`Successfully added ${quantityNum} ${unit} of ${species}!`);
+      setSuccess(t('messages.stockItemCreated'));
       
       // Reset form
       setSpecies('');
+      setCustomSpecies('');
       setQuantity('');
+      setUnitPrice('');
       setLocation('');
       setNotes('');
       
-      onStockItemCreated(stockItem);
+      onStockItemCreated();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create stock item');
+      setError(err instanceof Error ? err.message : t('messages.errorCreatingStock'));
     } finally {
       setLoading(false);
     }
@@ -74,10 +100,12 @@ export const StockForm: React.FC<StockFormProps> = ({
   if (!selectedUser) {
     return (
       <div className="card">
-        <h2>🍓🍄 Add Stock Item</h2>
+        <h2>
+          {t('stock.addItem')}
+        </h2>
         <div className="empty-state">
-          <h3>No User Selected</h3>
-          <p>Please create or select a user account first to start tracking your collections.</p>
+          <h3>{t('user.selectUser')}</h3>
+          <p>{t('messages.selectUserFirst')}</p>
         </div>
       </div>
     );
@@ -85,9 +113,11 @@ export const StockForm: React.FC<StockFormProps> = ({
 
   return (
     <div className="card">
-      <h2>🍓🍄 Add Stock Item</h2>
+      <h2>
+        {t('stock.addItem')}
+      </h2>
       <p style={{ marginBottom: '20px', color: '#718096' }}>
-        Adding items for: <span className="current-user">{selectedUser.name}</span>
+        {t('user.addingItemsFor')}: <span className="current-user">{selectedUser.name}</span>
       </p>
       
       {error && <div className="error">{error}</div>}
@@ -95,42 +125,67 @@ export const StockForm: React.FC<StockFormProps> = ({
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="type">Type</label>
+          <label htmlFor="type">{t('stock.type')}</label>
           <select
             id="type"
             className="form-control"
             value={type}
-            onChange={(e) => setType(e.target.value as 'berry' | 'mushroom')}
+            onChange={(e) => {
+              setType(e.target.value as 'berry' | 'mushroom');
+              setSpecies(''); // Reset species when type changes
+              setCustomSpecies(''); // Reset custom species too
+            }}
             disabled={loading}
           >
-            <option value="berry">🍓 Berry</option>
-            <option value="mushroom">🍄 Mushroom</option>
+            <option value="berry">{t('stock.berry')}</option>
+            <option value="mushroom">{t('stock.mushroom')}</option>
           </select>
         </div>
 
         <div className="form-group">
-          <label htmlFor="species">Species/Variety *</label>
-          <input
-            type="text"
+          <label htmlFor="species">{t('stock.speciesRequired')}</label>
+          <select
             id="species"
             className="form-control"
             value={species}
-            onChange={(e) => setSpecies(e.target.value)}
-            placeholder={type === 'berry' ? 'e.g., Blueberry, Strawberry' : 'e.g., Chanterelle, Porcini'}
+            onChange={(e) => {
+              setSpecies(e.target.value);
+              if (e.target.value !== 'other') {
+                setCustomSpecies(''); // Clear custom species when not "other"
+              }
+            }}
             disabled={loading}
-          />
+          >
+            <option value="">{type === 'berry' ? t('placeholders.berrySpecies') : t('placeholders.mushroomSpecies')}</option>
+            {getSpeciesOptions().map(([key, value]) => (
+              <option key={key} value={key}>
+                {value}
+              </option>
+            ))}
+          </select>
+          {species === 'other' && (
+            <input
+              type="text"
+              className="form-control"
+              style={{ marginTop: '10px' }}
+              value={customSpecies}
+              onChange={(e) => setCustomSpecies(e.target.value)}
+              placeholder={t('placeholders.customSpecies')}
+              disabled={loading}
+            />
+          )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '15px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
           <div className="form-group">
-            <label htmlFor="quantity">Quantity *</label>
+            <label htmlFor="quantity">{t('stock.quantityRequired')}</label>
             <input
               type="number"
               id="quantity"
               className="form-control"
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
-              placeholder="0"
+              placeholder={t('placeholders.quantity')}
               step="0.1"
               min="0"
               disabled={loading}
@@ -138,42 +193,42 @@ export const StockForm: React.FC<StockFormProps> = ({
           </div>
 
           <div className="form-group">
-            <label htmlFor="unit">Unit</label>
-            <select
-              id="unit"
+            <label htmlFor="unitPrice">{t('stock.unitPriceRequired')}</label>
+            <input
+              type="number"
+              id="unitPrice"
               className="form-control"
-              value={unit}
-              onChange={(e) => setUnit(e.target.value as 'kg' | 'g' | 'pieces')}
+              value={unitPrice}
+              onChange={(e) => setUnitPrice(e.target.value)}
+              placeholder={t('placeholders.unitPrice')}
+              step="0.01"
+              min="0"
               disabled={loading}
-            >
-              <option value="kg">kg</option>
-              <option value="g">g</option>
-              <option value="pieces">pieces</option>
-            </select>
+            />
           </div>
         </div>
 
         <div className="form-group">
-          <label htmlFor="location">Collection Location *</label>
+          <label htmlFor="location">{t('stock.locationRequired')}</label>
           <input
             type="text"
             id="location"
             className="form-control"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="e.g., Pine Forest, Backyard, Meadow"
+            placeholder={t('placeholders.location')}
             disabled={loading}
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="notes">Notes (Optional)</label>
+          <label htmlFor="notes">{t('stock.notesOptional')}</label>
           <textarea
             id="notes"
             className="form-control"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Additional notes about the collection..."
+            placeholder={t('placeholders.notes')}
             rows={3}
             disabled={loading}
           />
@@ -181,10 +236,14 @@ export const StockForm: React.FC<StockFormProps> = ({
         
         <button 
           type="submit" 
-          className="btn" 
-          disabled={loading || !species.trim() || !quantity || !location.trim()}
+          className="btn icon-with-text" 
+          disabled={loading || !getFinalSpeciesValue() || !quantity || !unitPrice || !location.trim()}
         >
-          {loading ? 'Adding...' : `Add ${type === 'berry' ? '🍓' : '🍄'} Stock`}
+          {loading ? (
+            t('messages.loading')
+          ) : (
+            t('stock.addStockButton')
+          )}
         </button>
       </form>
     </div>

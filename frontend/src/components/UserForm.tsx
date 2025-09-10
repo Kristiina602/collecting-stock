@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { userApi } from '../services/api';
 import { User } from '../types';
 
@@ -7,6 +8,7 @@ interface UserFormProps {
 }
 
 export const UserForm: React.FC<UserFormProps> = ({ onUserCreated }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +18,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onUserCreated }) => {
     e.preventDefault();
     
     if (!name.trim()) {
-      setError('Name is required');
+      setError(t('messages.nameRequired'));
       return;
     }
 
@@ -26,11 +28,11 @@ export const UserForm: React.FC<UserFormProps> = ({ onUserCreated }) => {
 
     try {
       const user = await userApi.create({ name: name.trim() });
-      setSuccess(`Welcome, ${user.name}! You can now start tracking your collections.`);
+      setSuccess(t('messages.userCreated'));
       setName('');
       onUserCreated(user);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create user');
+      setError(err instanceof Error ? err.message : t('messages.errorCreatingUser'));
     } finally {
       setLoading(false);
     }
@@ -38,21 +40,21 @@ export const UserForm: React.FC<UserFormProps> = ({ onUserCreated }) => {
 
   return (
     <div className="card">
-      <h2>👤 Create User Account</h2>
+      <h2>👤 {t('user.createAccount')}</h2>
       
       {error && <div className="error">{error}</div>}
       {success && <div className="success">{success}</div>}
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="userName">Your Name</label>
+          <label htmlFor="userName">{t('user.enterName')}</label>
           <input
             type="text"
             id="userName"
             className="form-control"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your name"
+            placeholder={t('user.enterName')}
             disabled={loading}
           />
         </div>
@@ -62,7 +64,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onUserCreated }) => {
           className="btn" 
           disabled={loading || !name.trim()}
         >
-          {loading ? 'Creating...' : 'Create Account'}
+          {loading ? t('messages.loading') : t('user.createAccountButton')}
         </button>
       </form>
     </div>

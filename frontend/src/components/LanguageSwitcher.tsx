@@ -6,7 +6,7 @@ interface LanguageSwitcherProps {
 }
 
 export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className = '' }) => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -16,19 +16,20 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className = 
 
   return (
     <div className={`language-switcher ${className}`}>
+      <span className="language-title">{t('language.title')}</span>
       <button
         onClick={() => changeLanguage('en')}
         className={`lang-button ${currentLanguage === 'en' ? 'active' : ''}`}
-        title="Switch to English"
+        title={t('language.switchToEnglish')}
       >
-        EN
+        {t('language.english')}
       </button>
       <button
         onClick={() => changeLanguage('fi')}
         className={`lang-button ${currentLanguage === 'fi' ? 'active' : ''}`}
-        title="Vaihda suomeksi"
+        title={t('language.switchToFinnish')}
       >
-        FI
+        {t('language.finnish')}
       </button>
     </div>
   );

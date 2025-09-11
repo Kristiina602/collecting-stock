@@ -13,7 +13,6 @@ interface IconProps {
 
 const iconMap: Record<IconName, string> = {
   'mushrooms': icons.mushrooms,
-  'berry': icons.berry,
   'trash': icons.trash,
   'refresh': icons.refresh,
   'box': icons.box,
@@ -74,38 +73,3 @@ export const Icon: React.FC<IconProps> = ({
   );
 };
 
-// Utility component for mushroom icons with species detection
-interface MushroomIconProps {
-  species?: string;
-  size?: number;
-  className?: string;
-  title?: string;
-}
-
-export const MushroomIcon: React.FC<MushroomIconProps> = ({ 
-  species = '', 
-  size = 24, 
-  className = '', 
-  title 
-}) => {
-  // Determine the best mushroom icon based on species name
-  const getMushroomIconName = (speciesName: string): IconName => {
-    const lowerSpecies = speciesName.toLowerCase();
-    
-    if (lowerSpecies.includes('chanterelle')) return 'mushrooms';
-    
-    // Default to generic mushrooms icon for all mushroom species
-    return 'mushrooms';
-  };
-
-  const iconName = getMushroomIconName(species);
-
-  return (
-    <Icon 
-      name={iconName} 
-      size={size} 
-      className={className} 
-      title={title || `${species} mushroom`}
-    />
-  );
-};

@@ -130,7 +130,7 @@ npm run preview
 3. **Select your user** from the dropdown at the top
 
 4. **Add stock items**:
-   - Choose between Berry 🍓 or Mushroom 🍄
+   - Choose between Berry or Mushroom
    - Enter the species/variety name
    - Specify quantity in grams (g)
    - Add the collection location
@@ -235,4 +235,4 @@ This project is licensed under the MIT License.
 
 ---
 
-Happy collecting! 🍓🍄
+Happy collecting!

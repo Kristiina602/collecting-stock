@@ -1,19 +1,51 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
-import { Icon, MushroomIcon } from './components/Icon';
+import { CreateUserDialog } from './components/CreateUserDialog';
+import { LoginDialog } from './components/LoginDialog';
 import { HomePage } from './pages/HomePage';
 import { CollectionsPage } from './pages/CollectionsPage';
+import { User } from './types';
 import './App.css';
 
 const AppContent: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [newlyCreatedUser, setNewlyCreatedUser] = useState<User | null>(null);
+  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
 
-  const handleUserCreated = () => {
-    // User creation is handled in the home page
-    // No need to track selectedUser at App level anymore
+  const handleUserCreated = (user: User) => {
+    setNewlyCreatedUser(user);
+    setLoggedInUser(null); // Clear logged in user when creating new user
+    // Navigate to Collections page after successful user creation
+    navigate('/collections');
+  };
+
+  const handleUserLoggedIn = (user: User) => {
+    setLoggedInUser(user);
+    setNewlyCreatedUser(null); // Clear newly created user when logging in
+    // Navigate to Collections page after successful login
+    navigate('/collections');
+  };
+
+  const openCreateUserDialog = () => {
+    setIsCreateUserDialogOpen(true);
+  };
+
+  const closeCreateUserDialog = () => {
+    setIsCreateUserDialogOpen(false);
+  };
+
+  const openLoginDialog = () => {
+    setIsLoginDialogOpen(true);
+  };
+
+  const closeLoginDialog = () => {
+    setIsLoginDialogOpen(false);
   };
 
   return (
@@ -22,8 +54,6 @@ const AppContent: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div></div>
           <h1 className="icon-with-text" style={{ justifyContent: 'center', margin: 0 }}>
-            <Icon name="berry" size={32} />
-            <MushroomIcon species="chanterelle" size={32} />
             {t('app.title')}
           </h1>
           <LanguageSwitcher />
@@ -45,19 +75,49 @@ const AppContent: React.FC = () => {
           >
             {t('navigation.collections')}
           </Link>
+          {location.pathname === '/' && (
+            <div className="nav-links-right">
+              <button 
+                className="nav-link" 
+                onClick={openLoginDialog}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', marginRight: '12px' }}
+              >
+                {t('user.login')}
+              </button>
+              <button 
+                className="nav-link" 
+                onClick={openCreateUserDialog}
+                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                {t('user.createAccount')}
+              </button>
+            </div>
+          )}
         </div>
       </nav>
 
       <Routes>
         <Route 
           path="/" 
-          element={<HomePage onUserCreated={handleUserCreated} />} 
+          element={<HomePage />} 
         />
         <Route 
           path="/collections" 
-          element={<CollectionsPage />} 
+          element={<CollectionsPage preSelectedUser={newlyCreatedUser || loggedInUser} />} 
         />
       </Routes>
+
+      <CreateUserDialog 
+        isOpen={isCreateUserDialogOpen}
+        onClose={closeCreateUserDialog}
+        onUserCreated={handleUserCreated}
+      />
+      
+      <LoginDialog 
+        isOpen={isLoginDialogOpen}
+        onClose={closeLoginDialog}
+        onUserLoggedIn={handleUserLoggedIn}
+      />
     </div>
   );
 };

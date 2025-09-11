@@ -1,6 +1,6 @@
 export interface User {
   id: string;
-  name: string;
+  aliasName: string;
   createdAt: string;
   revenue: number;
 }
@@ -26,7 +26,7 @@ export interface ApiResponse<T> {
 }
 
 export interface CreateUserRequest {
-  name: string;
+  aliasName: string;
 }
 
 export interface CreateStockItemRequest {

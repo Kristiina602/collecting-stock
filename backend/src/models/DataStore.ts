@@ -6,10 +6,10 @@ class DataStore {
   private stockItems: StockItem[] = [];
 
   // User operations
-  createUser(name: string): User {
+  createUser(aliasName: string): User {
     const user: User = {
       id: uuidv4(),
-      name,
+      aliasName,
       createdAt: new Date(),
       revenue: 0
     };

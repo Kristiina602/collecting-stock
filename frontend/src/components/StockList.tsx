@@ -86,7 +86,7 @@ export const StockList: React.FC<StockListProps> = ({
         {t('stock.yourCollections')}
       </h2>
       <p style={{ marginBottom: '20px', color: '#718096' }}>
-        {t('stock.showingCollectionsFor')} <span className="current-user">{selectedUser.name}</span>
+        {t('stock.showingCollectionsFor')} <span className="current-user">{selectedUser.aliasName}</span>
       </p>
       
       {error && <div className="error">{error}</div>}
@@ -112,8 +112,8 @@ export const StockList: React.FC<StockListProps> = ({
                   {item.species}
                 </h4>
                 <p><strong>{t('stock.quantityLabel')}</strong> {item.quantity} {t('units.grams')}</p>
-                <p><strong>{t('stock.unitPriceLabel')}</strong> ${item.unitPrice.toFixed(2)}</p>
-                <p><strong>{t('stock.totalPriceLabel')}</strong> ${item.totalPrice.toFixed(2)}</p>
+                <p><strong>{t('stock.unitPriceLabel')}</strong> €{item.unitPrice.toFixed(2)}</p>
+                <p><strong>{t('stock.totalPriceLabel')}</strong> €{item.totalPrice.toFixed(2)}</p>
                 <p><strong>{t('stock.locationLabel')}</strong> {item.location}</p>
                 <p><strong>{t('stock.collectedLabel')}</strong> {formatDate(item.collectedAt)}</p>
                 {item.notes && <p><strong>{t('stock.notesLabel')}</strong> {item.notes}</p>}
@@ -153,7 +153,7 @@ export const StockList: React.FC<StockListProps> = ({
               <div>
                 <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('stock.totalRevenue')}</p>
                 <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px', color: '#065f46' }}>
-                  ${stockItems.reduce((total, item) => total + item.totalPrice, 0).toFixed(2)}
+                  €{stockItems.reduce((total, item) => total + item.totalPrice, 0).toFixed(2)}
                 </p>
               </div>
             </div>

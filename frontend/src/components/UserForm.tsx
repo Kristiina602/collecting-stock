@@ -27,7 +27,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onUserCreated }) => {
     setSuccess(null);
 
     try {
-      const user = await userApi.create({ name: name.trim() });
+      const user = await userApi.create({ aliasName: name.trim() });
       setSuccess(t('messages.userCreated'));
       setName('');
       onUserCreated(user);
@@ -54,7 +54,6 @@ export const UserForm: React.FC<UserFormProps> = ({ onUserCreated }) => {
             className="form-control"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder={t('user.enterName')}
             disabled={loading}
           />
         </div>

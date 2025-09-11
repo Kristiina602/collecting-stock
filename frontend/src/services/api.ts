@@ -42,7 +42,7 @@ export const stockApi = {
   create: async (stockData: CreateStockItemRequest): Promise<StockItem> => {
     const response = await api.post<ApiResponse<StockItem>>('/stock', stockData);
     if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || 'Failed to create stock item');
+      throw new Error(response.data.error || 'Failed to create collecting item');
     }
     return response.data.data;
   },
@@ -51,7 +51,7 @@ export const stockApi = {
     const params = userId ? { userId } : {};
     const response = await api.get<ApiResponse<StockItem[]>>('/stock', { params });
     if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || 'Failed to fetch stock items');
+      throw new Error(response.data.error || 'Failed to fetch collecting items');
     }
     return response.data.data;
   },
@@ -59,7 +59,7 @@ export const stockApi = {
   getById: async (id: string): Promise<StockItem> => {
     const response = await api.get<ApiResponse<StockItem>>(`/stock/${id}`);
     if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || 'Failed to fetch stock item');
+      throw new Error(response.data.error || 'Failed to fetch collecting item');
     }
     return response.data.data;
   },
@@ -67,7 +67,7 @@ export const stockApi = {
   update: async (id: string, updates: Partial<StockItem>): Promise<StockItem> => {
     const response = await api.put<ApiResponse<StockItem>>(`/stock/${id}`, updates);
     if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || 'Failed to update stock item');
+      throw new Error(response.data.error || 'Failed to update collecting item');
     }
     return response.data.data;
   },
@@ -75,7 +75,7 @@ export const stockApi = {
   delete: async (id: string): Promise<void> => {
     const response = await api.delete<ApiResponse<void>>(`/stock/${id}`);
     if (!response.data.success) {
-      throw new Error(response.data.error || 'Failed to delete stock item');
+      throw new Error(response.data.error || 'Failed to delete collecting item');
     }
   },
 };

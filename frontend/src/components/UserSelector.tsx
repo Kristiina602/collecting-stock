@@ -69,12 +69,18 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
   }, []);
 
   if (loading) {
-    return <div className="user-select">{t('messages.loadingUsers')}</div>;
+    return (
+      <div className="card">
+        <h2>{t('user.selectActiveUser')}</h2>
+        {t('messages.loadingUsers')}
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="user-select">
+      <div className="card">
+        <h2>{t('user.selectActiveUser')}</h2>
         <div className="error">{error}</div>
         <button className="btn btn-small" onClick={refreshUsers}>
           {t('messages.tryAgain')}
@@ -84,19 +90,18 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
   }
 
   return (
-    <div className="user-select">
-      <label htmlFor="userSelect">{t('user.selectActiveUser')}</label>
+    <div className="card">
+      <h2>{t('user.selectActiveUser')}</h2>
       <select
         id="userSelect"
         className="form-control"
         value={selectedUser?.id || ''}
         onChange={handleUserChange}
-        style={{ marginTop: '8px' }}
       >
         <option value="">{t('user.selectUserPlaceholder')}</option>
         {users.map(user => (
           <option key={user.id} value={user.id}>
-            {user.name}
+            {user.aliasName}
           </option>
         ))}
       </select>
@@ -104,7 +109,7 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
       {selectedUser && (
         <div style={{ marginTop: '10px' }}>
           <p>
-            {t('user.currentlyTracking')} <span className="current-user">{selectedUser.name}</span>
+            {t('user.currentlyTracking')} <span className="current-user">{selectedUser.aliasName}</span>
           </p>
           <p style={{ color: '#065f46', fontWeight: 'bold' }}>
             {t('stock.totalRevenue')}: {t('units.currency')}{selectedUser.revenue.toFixed(2)}

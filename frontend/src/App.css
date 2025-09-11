@@ -21,11 +21,9 @@ body {
 
 .header {
   text-align: center;
-  margin-bottom: 30px;
   padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #e4eff1 0%, #2096c4 100%);
+  color: dimgray;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -39,10 +37,43 @@ body {
   opacity: 0.9;
 }
 
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.language-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-right: 4px;
+  opacity: 0.9;
+}
+
+.lang-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.lang-button.active {
+  background: rgba(255, 255, 255, 0.9);
+  color: #667eea;
+  font-weight: 500;
+}
+
 .navigation {
-  max-width: 1200px;
   margin: 0 auto 30px auto;
-  padding: 0 20px;
 }
 
 .nav-links {
@@ -51,8 +82,15 @@ body {
   justify-content: center;
   background: white;
   padding: 15px;
-  border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.nav-links-right {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .nav-link {
@@ -60,7 +98,7 @@ body {
   color: #4a5568;
   padding: 10px 20px;
   border-radius: 8px;
-  font-weight: 500;
+  font-weight: 800;
   transition: all 0.2s ease;
   border: 2px solid transparent;
 }
@@ -71,13 +109,12 @@ body {
 }
 
 .nav-link.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-color: #667eea;
+  background: #b4daed;
+  color: dimgray;
+  border-color: #b4daed;;
 }
 
 .welcome-section {
-  max-width: 1200px;
   margin: 0 auto 40px auto;
   text-align: center;
   padding: 30px;
@@ -96,6 +133,29 @@ body {
   color: #718096;
   font-size: 1.1rem;
   line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.blueberry-images {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.blueberry-image {
+  max-width: 150px;
+  max-height: 150px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.blueberry-image:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .home-page .main-content {
@@ -338,4 +398,60 @@ body {
 .icon-large {
   width: 24px;
   height: 24px;
+}
+
+/* Dialog styles */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 20px 0 20px;
+}
+
+.dialog-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.dialog-close:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.dialog-body {
+  padding: 0 20px 20px 20px;
 }

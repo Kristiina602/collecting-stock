@@ -4,16 +4,16 @@ import { ApiResponse, CreateUserRequest } from '../types';
 
 export const createUser = (req: Request<{}, ApiResponse<any>, CreateUserRequest>, res: Response<ApiResponse<any>>) => {
   try {
-    const { name } = req.body;
+    const { aliasName } = req.body;
 
-    if (!name || name.trim().length === 0) {
+    if (!aliasName || aliasName.trim().length === 0) {
       return res.status(400).json({
         success: false,
-        error: 'Name is required and cannot be empty'
+        error: 'Alias name is required and cannot be empty'
       });
     }
 
-    const user = dataStore.createUser(name.trim());
+    const user = dataStore.createUser(aliasName.trim());
     
     res.status(201).json({
       success: true,

@@ -10,7 +10,7 @@ export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockIt
     if (!userId || !type || !species || !quantity || unitPrice === undefined || !location) {
       return res.status(400).json({
         success: false,
-        error: 'All required fields must be provided: userId, type, species, quantity, unitPrice, location'
+        error: 'All required fields must be provided: alias name, type, species, quantity, price, location'
       });
     }
 
@@ -31,7 +31,7 @@ export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockIt
     if (unitPrice < 0) {
       return res.status(400).json({
         success: false,
-        error: 'Unit price must be greater than or equal to 0'
+        error: 'Price must be greater than or equal to 0'
       });
     }
 
@@ -57,7 +57,7 @@ export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockIt
     res.status(201).json({
       success: true,
       data: stockItem,
-      message: 'Stock item created successfully'
+      message: 'Collecting item created successfully'
     });
   } catch (error) {
     res.status(500).json({
@@ -98,7 +98,7 @@ export const getStockItemById = (req: Request<{ id: string }>, res: Response<Api
     if (!stockItem) {
       return res.status(404).json({
         success: false,
-        error: 'Stock item not found'
+        error: 'Collecting item not found'
       });
     }
 
@@ -124,14 +124,14 @@ export const updateStockItem = (req: Request<{ id: string }>, res: Response<ApiR
     if (!stockItem) {
       return res.status(404).json({
         success: false,
-        error: 'Stock item not found'
+        error: 'Collecting item not found'
       });
     }
 
     res.json({
       success: true,
       data: stockItem,
-      message: 'Stock item updated successfully'
+      message: 'Collecting item updated successfully'
     });
   } catch (error) {
     res.status(500).json({
@@ -149,13 +149,13 @@ export const deleteStockItem = (req: Request<{ id: string }>, res: Response<ApiR
     if (!deleted) {
       return res.status(404).json({
         success: false,
-        error: 'Stock item not found'
+        error: 'Collecting item not found'
       });
     }
 
     res.json({
       success: true,
-      message: 'Stock item deleted successfully'
+      message: 'Collecting item deleted successfully'
     });
   } catch (error) {
     res.status(500).json({

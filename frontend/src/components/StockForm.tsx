@@ -117,7 +117,7 @@ export const StockForm: React.FC<StockFormProps> = ({
         {t('stock.addItem')}
       </h2>
       <p style={{ marginBottom: '20px', color: '#718096' }}>
-        {t('user.addingItemsFor')}: <span className="current-user">{selectedUser.name}</span>
+        {t('user.addingItemsFor')}: <span className="current-user">{selectedUser.aliasName}</span>
       </p>
       
       {error && <div className="error">{error}</div>}

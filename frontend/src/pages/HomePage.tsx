@@ -1,13 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { UserForm } from '../components/UserForm';
-import { User } from '../types';
+import blueberries1 from '../assets/icons/blueberries_1.png';
+import blueberries2 from '../assets/icons/blueberries_2.png';
+import blueberries3 from '../assets/icons/blueberries_3.png';
 
-interface HomePageProps {
-  onUserCreated: (user: User) => void;
-}
-
-export const HomePage: React.FC<HomePageProps> = ({ onUserCreated }) => {
+export const HomePage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
@@ -15,11 +12,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onUserCreated }) => {
       <div className="welcome-section">
         <h2>{t('app.welcome')}</h2>
         <p>{t('app.welcomeDescription')}</p>
-      </div>
-      
-      <div className="main-content">
-        <div>
-          <UserForm onUserCreated={onUserCreated} />
+        <div className="blueberry-images">
+          <img src={blueberries1} alt="Blueberries 1" className="blueberry-image" />
+          <img src={blueberries2} alt="Blueberries 2" className="blueberry-image" />
+          <img src={blueberries3} alt="Blueberries 3" className="blueberry-image" />
         </div>
       </div>
     </div>

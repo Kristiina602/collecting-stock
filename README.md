@@ -1,4 +1,4 @@
-# Collecting Stock
+# Collections Stock
 
 A web application for tracking and managing your berry and mushroom collections. Built with React TypeScript frontend and Node.js backend.
 

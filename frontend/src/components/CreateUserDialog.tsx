@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { UserForm } from './UserForm';
 import { User } from '../types';
 
@@ -14,7 +13,6 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
   onClose, 
   onUserCreated 
 }) => {
-  const { t } = useTranslation();
 
   const handleUserCreated = (user: User) => {
     onUserCreated(user);

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { stockApi } from '../services/api';
-import { User } from '../types';
+import { stockApi, priceApi } from '../services/api';
+import { User, Price } from '../types';
 
 interface StockFormProps {
   selectedUser: User | null;
@@ -18,11 +18,15 @@ export const StockForm: React.FC<StockFormProps> = ({
   const [customSpecies, setCustomSpecies] = useState('');
   const [quantity, setQuantity] = useState('');
   const [unitPrice, setUnitPrice] = useState('');
+  const [buyPrice, setBuyPrice] = useState('');
+  const [sellPrice, setSellPrice] = useState('');
   const [location, setLocation] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [currentPrice, setCurrentPrice] = useState<Price | null>(null);
+  const [priceFromMonitoring, setPriceFromMonitoring] = useState(true);
 
   // Get species options based on type
   const getSpeciesOptions = () => {
@@ -38,6 +42,42 @@ export const StockForm: React.FC<StockFormProps> = ({
     return species ? t(`species.${type === 'berry' ? 'berries' : 'mushrooms'}.${species}`) : '';
   };
 
+  // Load current price when species changes
+  const loadCurrentPrice = async (type: 'berry' | 'mushroom', species: string) => {
+    if (!species) {
+      setCurrentPrice(null);
+      return;
+    }
+
+    try {
+      const price = await priceApi.getCurrent(type, species);
+      setCurrentPrice(price);
+      
+      if (price && priceFromMonitoring) {
+        // Convert from €/g to €/kg (multiply by 1000)
+        setBuyPrice((price.buyPrice * 1000).toFixed(2));
+        setSellPrice((price.sellPrice * 1000).toFixed(2));
+      }
+    } catch (err) {
+      console.error('Failed to load current price:', err);
+      setCurrentPrice(null);
+    }
+  };
+
+  // Effect to load price when species changes
+  useEffect(() => {
+    const finalSpecies = getFinalSpeciesValue();
+    if (finalSpecies) {
+      loadCurrentPrice(type, finalSpecies);
+    } else {
+      setCurrentPrice(null);
+      if (priceFromMonitoring) {
+        setBuyPrice('');
+        setSellPrice('');
+      }
+    }
+  }, [type, species, customSpecies, priceFromMonitoring]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -47,7 +87,7 @@ export const StockForm: React.FC<StockFormProps> = ({
     }
 
     const finalSpecies = getFinalSpeciesValue();
-    if (!finalSpecies || !quantity || !unitPrice || !location.trim()) {
+    if (!finalSpecies || !quantity || (!unitPrice && !sellPrice) || !location.trim()) {
       setError(t('messages.allFieldsRequired'));
       return;
     }
@@ -58,9 +98,29 @@ export const StockForm: React.FC<StockFormProps> = ({
       return;
     }
 
-    const unitPriceNum = parseFloat(unitPrice);
-    if (isNaN(unitPriceNum) || unitPriceNum < 0) {
+    // Handle price validation - support both old (unitPrice) and new (buy/sell prices) API
+    const unitPriceNum = unitPrice ? parseFloat(unitPrice) : undefined;
+    const buyPriceNum = buyPrice ? parseFloat(buyPrice) : 0;
+    const sellPriceNum = sellPrice ? parseFloat(sellPrice) : unitPriceNum;
+    
+    if (unitPriceNum !== undefined && (isNaN(unitPriceNum) || unitPriceNum < 0)) {
       setError(t('messages.unitPriceNonNegative'));
+      return;
+    }
+    
+    if (buyPriceNum !== undefined && (isNaN(buyPriceNum) || buyPriceNum < 0)) {
+      setError(t('messages.buyPriceNonNegative'));
+      return;
+    }
+    
+    if (sellPriceNum !== undefined && (isNaN(sellPriceNum) || sellPriceNum < 0)) {
+      setError(t('messages.sellPriceNonNegative'));
+      return;
+    }
+    
+    // Need either unitPrice or sellPrice
+    if (!sellPriceNum && !unitPriceNum) {
+      setError(t('messages.allFieldsRequired'));
       return;
     }
 
@@ -75,6 +135,8 @@ export const StockForm: React.FC<StockFormProps> = ({
         species: finalSpecies,
         quantity: quantityNum,
         unitPrice: unitPriceNum,
+        buyPrice: buyPriceNum,
+        sellPrice: sellPriceNum || unitPriceNum || 0,
         location: location.trim(),
         notes: notes.trim() || undefined,
       });
@@ -86,6 +148,8 @@ export const StockForm: React.FC<StockFormProps> = ({
       setCustomSpecies('');
       setQuantity('');
       setUnitPrice('');
+      setBuyPrice('');
+      setSellPrice('');
       setLocation('');
       setNotes('');
       
@@ -176,36 +240,111 @@ export const StockForm: React.FC<StockFormProps> = ({
           )}
         </div>
 
+        <div className="form-group">
+          <label htmlFor="quantity">{t('stock.quantityRequired')}</label>
+          <input
+            type="number"
+            id="quantity"
+            className="form-control"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            placeholder={t('placeholders.quantity')}
+            step="0.1"
+            min="0"
+            disabled={loading}
+          />
+        </div>
+
+        {/* Price source toggle */}
+        <div className="form-group" style={{ marginBottom: '15px' }}>
+          <label>
+            <input
+              type="checkbox"
+              checked={priceFromMonitoring}
+              onChange={(e) => {
+                setPriceFromMonitoring(e.target.checked);
+                if (!e.target.checked) {
+                  setBuyPrice('');
+                  setSellPrice('');
+                }
+              }}
+              style={{ marginRight: '8px' }}
+            />
+            {t('stock.usePriceMonitoring')}
+          </label>
+          {currentPrice && (
+            <div style={{ marginTop: '5px', fontSize: '14px', color: '#718096' }}>
+              {t('stock.currentPrices')}: {t('stock.buyPrice')} €{(currentPrice.buyPrice * 1000).toFixed(2)}/kg, {t('stock.sellPrice')} €{(currentPrice.sellPrice * 1000).toFixed(2)}/kg ({t('stock.priceYear')}: {currentPrice.year})
+            </div>
+          )}
+          {!currentPrice && getFinalSpeciesValue() && priceFromMonitoring && (
+            <div style={{ marginTop: '5px', fontSize: '14px', color: '#e53e3e' }}>
+              {t('stock.noPriceFound', { species: getFinalSpeciesValue() })}
+            </div>
+          )}
+        </div>
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
           <div className="form-group">
-            <label htmlFor="quantity">{t('stock.quantityRequired')}</label>
+            <label htmlFor="buyPrice">{t('stock.buyPriceRequired')}</label>
             <input
               type="number"
-              id="quantity"
+              id="buyPrice"
               className="form-control"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              placeholder={t('placeholders.quantity')}
-              step="0.1"
+              value={buyPrice}
+              onChange={(e) => {
+                setBuyPrice(e.target.value);
+                if (priceFromMonitoring && e.target.value) {
+                  setPriceFromMonitoring(false); // Switch to manual mode if user edits
+                }
+              }}
+              placeholder={t('placeholders.buyPrice')}
+              step="0.01"
               min="0"
-              disabled={loading}
+              disabled={loading || (priceFromMonitoring && !currentPrice)}
+              readOnly={priceFromMonitoring && !!currentPrice}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="unitPrice">{t('stock.unitPriceRequired')}</label>
+            <label htmlFor="sellPrice">{t('stock.sellPriceRequired')}</label>
             <input
               type="number"
-              id="unitPrice"
+              id="sellPrice"
               className="form-control"
-              value={unitPrice}
-              onChange={(e) => setUnitPrice(e.target.value)}
-              placeholder={t('placeholders.unitPrice')}
+              value={sellPrice}
+              onChange={(e) => {
+                setSellPrice(e.target.value);
+                if (priceFromMonitoring && e.target.value) {
+                  setPriceFromMonitoring(false); // Switch to manual mode if user edits
+                }
+              }}
+              placeholder={t('placeholders.sellPrice')}
               step="0.01"
               min="0"
-              disabled={loading}
+              disabled={loading || (priceFromMonitoring && !currentPrice)}
+              readOnly={priceFromMonitoring && !!currentPrice}
             />
           </div>
+        </div>
+
+        {/* Keep unit price for backward compatibility, but make it optional */}
+        <div className="form-group" style={{ opacity: 0.7 }}>
+          <label htmlFor="unitPrice">{t('stock.unitPrice')} (legacy)</label>
+          <input
+            type="number"
+            id="unitPrice"
+            className="form-control"
+            value={unitPrice}
+            onChange={(e) => {
+              setUnitPrice(e.target.value);
+              if (!sellPrice) setSellPrice(e.target.value); // Auto-fill sell price if empty
+            }}
+            placeholder={t('placeholders.unitPrice')}
+            step="0.01"
+            min="0"
+            disabled={loading}
+          />
         </div>
 
         <div className="form-group">
@@ -237,7 +376,7 @@ export const StockForm: React.FC<StockFormProps> = ({
         <button 
           type="submit" 
           className="btn icon-with-text" 
-          disabled={loading || !getFinalSpeciesValue() || !quantity || !unitPrice || !location.trim()}
+          disabled={loading || !getFinalSpeciesValue() || !quantity || (!unitPrice && !sellPrice) || !location.trim()}
         >
           {loading ? (
             t('messages.loading')

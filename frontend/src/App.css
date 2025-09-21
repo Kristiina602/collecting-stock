@@ -265,11 +265,10 @@ body {
   background: #e53e3e;
 }
 
-/* Container that matches navigation bar width */
+/* Container that matches navigation bar width and main content width */
 .user-selector-container {
   max-width: 1200px;
   margin: 0 auto 30px auto;
-  padding: 0 20px;
 }
 
 .user-select {

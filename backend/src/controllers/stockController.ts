@@ -4,13 +4,21 @@ import { ApiResponse, CreateStockItemRequest } from '../types';
 
 export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockItemRequest>, res: Response<ApiResponse<any>>) => {
   try {
-    const { userId, type, species, quantity, unitPrice, location, notes } = req.body;
+    const { userId, type, species, quantity, unitPrice, buyPrice, sellPrice, location, notes } = req.body;
 
-    // Validation
-    if (!userId || !type || !species || !quantity || unitPrice === undefined || !location) {
+    // Validation - support both old API (unitPrice) and new API (buyPrice + sellPrice)
+    if (!userId || !type || !species || !quantity || !location) {
       return res.status(400).json({
         success: false,
-        error: 'All required fields must be provided: alias name, type, species, quantity, price, location'
+        error: 'All required fields must be provided: userId, type, species, quantity, location'
+      });
+    }
+
+    // Price validation - need either unitPrice (old API) or sellPrice (new API)
+    if (unitPrice === undefined && sellPrice === undefined) {
+      return res.status(400).json({
+        success: false,
+        error: 'Either unitPrice (legacy) or sellPrice must be provided'
       });
     }
 
@@ -28,10 +36,25 @@ export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockIt
       });
     }
 
-    if (unitPrice < 0) {
+    // Validate prices
+    if (unitPrice !== undefined && unitPrice < 0) {
       return res.status(400).json({
         success: false,
-        error: 'Price must be greater than or equal to 0'
+        error: 'Unit price must be greater than or equal to 0'
+      });
+    }
+
+    if (buyPrice !== undefined && buyPrice < 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Buy price must be greater than or equal to 0'
+      });
+    }
+
+    if (sellPrice !== undefined && sellPrice < 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Sell price must be greater than or equal to 0'
       });
     }
 
@@ -44,12 +67,19 @@ export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockIt
       });
     }
 
+    // Handle backward compatibility and defaults
+    const finalBuyPrice = buyPrice || 0;
+    const finalSellPrice = sellPrice || unitPrice || 0;
+    const finalUnitPrice = unitPrice || finalSellPrice;
+
     const stockItem = dataStore.createStockItem({
       userId,
       type,
       species: species.trim(),
       quantity,
-      unitPrice,
+      unitPrice: finalUnitPrice,
+      buyPrice: finalBuyPrice,
+      sellPrice: finalSellPrice,
       location: location.trim(),
       notes: notes?.trim()
     });
@@ -69,11 +99,12 @@ export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockIt
 
 export const getStockItems = (req: Request, res: Response<ApiResponse<any>>) => {
   try {
-    const { userId } = req.query;
+    const { userId, year } = req.query;
     
     let stockItems;
     if (userId && typeof userId === 'string') {
-      stockItems = dataStore.getStockItemsByUser(userId);
+      const yearNum = year && typeof year === 'string' ? parseInt(year, 10) : undefined;
+      stockItems = dataStore.getStockItemsByUserAndYear(userId, yearNum);
     } else {
       stockItems = dataStore.getAllStockItems();
     }
@@ -156,6 +187,50 @@ export const deleteStockItem = (req: Request<{ id: string }>, res: Response<ApiR
     res.json({
       success: true,
       message: 'Collecting item deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+};
+
+// New endpoints for profit tracking
+export const getUserProfitByYear = (req: Request<{ userId: string }>, res: Response<ApiResponse<any>>) => {
+  try {
+    const { userId } = req.params;
+    
+    // Check if user exists
+    const user = dataStore.getUserById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    const yearlyData = dataStore.getUserProfitByYear(userId);
+    
+    res.json({
+      success: true,
+      data: yearlyData
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+};
+
+export const getAllYears = (req: Request, res: Response<ApiResponse<any>>) => {
+  try {
+    const years = dataStore.getAllYears();
+    
+    res.json({
+      success: true,
+      data: years
     });
   } catch (error) {
     res.status(500).json({

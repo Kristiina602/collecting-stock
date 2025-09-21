@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, StockItem, ApiResponse, CreateUserRequest, CreateStockItemRequest } from '../types';
+import { User, StockItem, Price, ApiResponse, CreateUserRequest, CreateStockItemRequest, CreatePriceRequest, UpdatePriceRequest } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -47,8 +47,11 @@ export const stockApi = {
     return response.data.data;
   },
 
-  getAll: async (userId?: string): Promise<StockItem[]> => {
-    const params = userId ? { userId } : {};
+  getAll: async (userId?: string, year?: number): Promise<StockItem[]> => {
+    const params: any = {};
+    if (userId) params.userId = userId;
+    if (year) params.year = year.toString();
+    
     const response = await api.get<ApiResponse<StockItem[]>>('/stock', { params });
     if (!response.data.success || !response.data.data) {
       throw new Error(response.data.error || 'Failed to fetch collecting items');
@@ -77,5 +80,87 @@ export const stockApi = {
     if (!response.data.success) {
       throw new Error(response.data.error || 'Failed to delete collecting item');
     }
+  },
+
+  // New profit tracking endpoints
+  getProfitByYear: async (userId: string): Promise<Record<number, { revenue: number; cost: number; profit: number; itemCount: number }>> => {
+    const response = await api.get<ApiResponse<Record<number, { revenue: number; cost: number; profit: number; itemCount: number }>>>(`/stock/profit/${userId}`);
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || 'Failed to fetch profit data');
+    }
+    return response.data.data;
+  },
+
+  getAllYears: async (): Promise<number[]> => {
+    const response = await api.get<ApiResponse<number[]>>('/stock/years');
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || 'Failed to fetch years');
+    }
+    return response.data.data;
+  },
+};
+
+// Price API
+export const priceApi = {
+  create: async (priceData: CreatePriceRequest): Promise<Price> => {
+    const response = await api.post<ApiResponse<Price>>('/prices', priceData);
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || 'Failed to create price');
+    }
+    return response.data.data;
+  },
+
+  getAll: async (year?: number, type?: 'berry' | 'mushroom', species?: string): Promise<Price[]> => {
+    const params: any = {};
+    if (year) params.year = year.toString();
+    if (type) params.type = type;
+    if (species) params.species = species;
+    
+    const response = await api.get<ApiResponse<Price[]>>('/prices', { params });
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || 'Failed to fetch prices');
+    }
+    return response.data.data;
+  },
+
+  getById: async (id: string): Promise<Price> => {
+    const response = await api.get<ApiResponse<Price>>(`/prices/${id}`);
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || 'Failed to fetch price');
+    }
+    return response.data.data;
+  },
+
+  update: async (id: string, updates: UpdatePriceRequest): Promise<Price> => {
+    const response = await api.put<ApiResponse<Price>>(`/prices/${id}`, updates);
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || 'Failed to update price');
+    }
+    return response.data.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    const response = await api.delete<ApiResponse<void>>(`/prices/${id}`);
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Failed to delete price');
+    }
+  },
+
+  getCurrent: async (type: 'berry' | 'mushroom', species: string): Promise<Price | null> => {
+    const response = await api.get<ApiResponse<Price | null>>('/prices/current', {
+      params: { type, species }
+    });
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Failed to fetch current price');
+    }
+    return response.data.data || null;
+  },
+
+  getYears: async (): Promise<number[]> => {
+    const response = await api.get<ApiResponse<number[]>>('/prices/years');
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || 'Failed to fetch price years');
+    }
+    return response.data.data;
   },
 };

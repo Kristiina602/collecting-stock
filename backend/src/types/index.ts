@@ -11,8 +11,13 @@ export interface StockItem {
   type: 'berry' | 'mushroom';
   species: string;
   quantity: number;
-  unitPrice: number;
-  totalPrice: number;
+  unitPrice: number; // Deprecated, use sellPrice
+  buyPrice: number;  // €/kg buy price
+  sellPrice: number; // €/kg sell price
+  totalRevenue: number; // calculated from quantity * sellPrice / 1000
+  totalCost: number;    // calculated from quantity * buyPrice / 1000
+  totalProfit: number;  // calculated from totalRevenue - totalCost
+  totalPrice: number;   // Deprecated, kept for backward compatibility
   location: string;
   collectedAt: Date;
   notes?: string;
@@ -34,7 +39,32 @@ export interface CreateStockItemRequest {
   type: 'berry' | 'mushroom';
   species: string;
   quantity: number;
-  unitPrice: number;
+  unitPrice?: number; // Deprecated, use sellPrice
+  buyPrice: number;   // €/kg buy price
+  sellPrice: number;  // €/kg sell price
   location: string;
   notes?: string;
+}
+
+export interface Price {
+  id: string;
+  type: 'berry' | 'mushroom';
+  species: string;
+  year: number;
+  buyPrice: number;  // €/g buy price
+  sellPrice: number; // €/g sell price
+  updatedAt: Date;
+}
+
+export interface CreatePriceRequest {
+  type: 'berry' | 'mushroom';
+  species: string;
+  year: number;
+  buyPrice: number;  // €/g buy price
+  sellPrice: number; // €/g sell price
+}
+
+export interface UpdatePriceRequest {
+  buyPrice?: number;  // €/g buy price
+  sellPrice?: number; // €/g sell price
 }

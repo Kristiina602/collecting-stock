@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StockForm } from '../components/StockForm';
 import { StockList } from '../components/StockList';
 import { UserSelector } from '../components/UserSelector';
+import { ProfitDashboard } from '../components/ProfitDashboard';
 import { User } from '../types';
 
 interface CollectionsPageProps {
@@ -48,6 +49,13 @@ const CollectionsPage: React.FC<CollectionsPageProps> = ({ preSelectedUser = nul
         
         <div>
           <StockList 
+            selectedUser={selectedUser}
+            refreshTrigger={refreshTrigger}
+          />
+        </div>
+        
+        <div>
+          <ProfitDashboard 
             selectedUser={selectedUser}
             refreshTrigger={refreshTrigger}
           />

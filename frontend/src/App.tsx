@@ -6,6 +6,7 @@ import { CreateUserDialog } from './components/CreateUserDialog';
 import { LoginDialog } from './components/LoginDialog';
 import { HomePage } from './pages/HomePage';
 import { CollectionsPage } from './pages/CollectionsPage';
+import { PriceMonitoringPage } from './pages/PriceMonitoringPage';
 import { User } from './types';
 import './App.css';
 
@@ -75,6 +76,12 @@ const AppContent: React.FC = () => {
           >
             {t('navigation.collections')}
           </Link>
+          <Link 
+            to="/price-monitoring" 
+            className={`nav-link ${location.pathname === '/price-monitoring' ? 'active' : ''}`}
+          >
+            {t('navigation.priceMonitoring')}
+          </Link>
           {location.pathname === '/' && (
             <div className="nav-links-right">
               <button 
@@ -104,6 +111,10 @@ const AppContent: React.FC = () => {
         <Route 
           path="/collections" 
           element={<CollectionsPage preSelectedUser={newlyCreatedUser || loggedInUser} />} 
+        />
+        <Route 
+          path="/price-monitoring" 
+          element={<PriceMonitoringPage />} 
         />
       </Routes>
 

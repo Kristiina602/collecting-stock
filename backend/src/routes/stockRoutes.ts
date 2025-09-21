@@ -4,13 +4,17 @@ import {
   getStockItems, 
   getStockItemById, 
   updateStockItem, 
-  deleteStockItem 
+  deleteStockItem,
+  getUserProfitByYear,
+  getAllYears
 } from '../controllers/stockController';
 
 const router = Router();
 
 router.post('/', createStockItem);
 router.get('/', getStockItems);
+router.get('/years', getAllYears);
+router.get('/profit/:userId', getUserProfitByYear);
 router.get('/:id', getStockItemById);
 router.put('/:id', updateStockItem);
 router.delete('/:id', deleteStockItem);

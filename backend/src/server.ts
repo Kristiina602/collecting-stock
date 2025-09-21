@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 
 import userRoutes from './routes/userRoutes';
 import stockRoutes from './routes/stockRoutes';
+import priceRoutes from './routes/priceRoutes';
 import { errorHandler } from './middleware/errorHandler';
 
 // Load environment variables
@@ -34,6 +35,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api/users', userRoutes);
 app.use('/api/stock', stockRoutes);
+app.use('/api/prices', priceRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

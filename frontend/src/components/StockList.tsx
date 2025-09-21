@@ -17,14 +17,24 @@ export const StockList: React.FC<StockListProps> = ({
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
 
   useEffect(() => {
     if (selectedUser) {
       loadStockItems();
+      loadAvailableYears();
     } else {
       setStockItems([]);
+      setAvailableYears([]);
     }
   }, [selectedUser, refreshTrigger]);
+
+  useEffect(() => {
+    if (selectedUser) {
+      loadStockItems();
+    }
+  }, [selectedYear]);
 
   const loadStockItems = async () => {
     if (!selectedUser) return;
@@ -32,7 +42,7 @@ export const StockList: React.FC<StockListProps> = ({
     try {
       setLoading(true);
       setError(null);
-      const items = await stockApi.getAll(selectedUser.id);
+      const items = await stockApi.getAll(selectedUser.id, selectedYear || undefined);
       setStockItems(items.sort((a, b) => 
         new Date(b.collectedAt).getTime() - new Date(a.collectedAt).getTime()
       ));
@@ -40,6 +50,15 @@ export const StockList: React.FC<StockListProps> = ({
       setError(err instanceof Error ? err.message : t('messages.failedToLoadStock'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAvailableYears = async () => {
+    try {
+      const years = await stockApi.getAllYears();
+      setAvailableYears(years);
+    } catch (err) {
+      console.error('Failed to load years:', err);
     }
   };
 
@@ -89,6 +108,28 @@ export const StockList: React.FC<StockListProps> = ({
         {t('stock.showingCollectionsFor')} <span className="current-user">{selectedUser.aliasName}</span>
       </p>
       
+      {availableYears.length > 0 && (
+        <div style={{ marginBottom: '20px' }}>
+          <label htmlFor="yearFilter" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            {t('stock.yearFilter')}
+          </label>
+          <select
+            id="yearFilter"
+            className="form-control"
+            value={selectedYear || ''}
+            onChange={(e) => setSelectedYear(e.target.value ? parseInt(e.target.value, 10) : null)}
+            style={{ width: '200px' }}
+          >
+            <option value="">{t('stock.allYears')}</option>
+            {availableYears.map(year => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      
       {error && <div className="error">{error}</div>}
       
       {loading ? (
@@ -112,8 +153,27 @@ export const StockList: React.FC<StockListProps> = ({
                   {item.species}
                 </h4>
                 <p><strong>{t('stock.quantityLabel')}</strong> {item.quantity} {t('units.grams')}</p>
-                <p><strong>{t('stock.unitPriceLabel')}</strong> €{item.unitPrice.toFixed(2)}</p>
-                <p><strong>{t('stock.totalPriceLabel')}</strong> €{item.totalPrice.toFixed(2)}</p>
+                {item.buyPrice > 0 && (
+                  <p><strong>{t('stock.buyPriceLabel')}</strong> €{item.buyPrice.toFixed(2)}/{t('units.pricePerKg').replace('€/', '')}</p>
+                )}
+                {item.sellPrice > 0 ? (
+                  <p><strong>{t('stock.sellPriceLabel')}</strong> €{item.sellPrice.toFixed(2)}/{t('units.pricePerKg').replace('€/', '')}</p>
+                ) : (
+                  <p><strong>{t('stock.unitPriceLabel')}</strong> €{item.unitPrice.toFixed(2)}/{t('units.pricePerKg').replace('€/', '')}</p>
+                )}
+                {item.totalRevenue !== undefined ? (
+                  <p><strong>{t('stock.totalRevenueLabel')}</strong> €{item.totalRevenue.toFixed(2)}</p>
+                ) : (
+                  <p><strong>{t('stock.totalPriceLabel')}</strong> €{item.totalPrice.toFixed(2)}</p>
+                )}
+                {item.totalCost !== undefined && item.totalCost > 0 && (
+                  <p><strong>{t('stock.totalCostLabel')}</strong> €{item.totalCost.toFixed(2)}</p>
+                )}
+                {item.totalProfit !== undefined && (
+                  <p style={{ color: item.totalProfit >= 0 ? '#065f46' : '#dc2626', fontWeight: 'bold' }}>
+                    <strong>{t('stock.totalProfitLabel')}</strong> €{item.totalProfit.toFixed(2)}
+                  </p>
+                )}
                 <p><strong>{t('stock.locationLabel')}</strong> {item.location}</p>
                 <p><strong>{t('stock.collectedLabel')}</strong> {formatDate(item.collectedAt)}</p>
                 {item.notes && <p><strong>{t('stock.notesLabel')}</strong> {item.notes}</p>}
@@ -143,7 +203,7 @@ export const StockList: React.FC<StockListProps> = ({
             borderRadius: '6px',
             border: '1px solid #e2e8f0'
           }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', textAlign: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px', textAlign: 'center' }}>
               <div>
                 <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('stock.totalItems')}</p>
                 <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px', color: '#2d3748' }}>
@@ -153,9 +213,25 @@ export const StockList: React.FC<StockListProps> = ({
               <div>
                 <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('stock.totalRevenue')}</p>
                 <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px', color: '#065f46' }}>
-                  €{stockItems.reduce((total, item) => total + item.totalPrice, 0).toFixed(2)}
+                  €{stockItems.reduce((total, item) => total + (item.totalRevenue || item.totalPrice || 0), 0).toFixed(2)}
                 </p>
               </div>
+              {stockItems.some(item => item.totalCost !== undefined && item.totalCost > 0) && (
+                <div>
+                  <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('stock.totalCost')}</p>
+                  <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px', color: '#dc2626' }}>
+                    €{stockItems.reduce((total, item) => total + (item.totalCost || 0), 0).toFixed(2)}
+                  </p>
+                </div>
+              )}
+              {stockItems.some(item => item.totalProfit !== undefined) && (
+                <div>
+                  <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('stock.totalProfit')}</p>
+                  <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px', color: stockItems.reduce((total, item) => total + (item.totalProfit || 0), 0) >= 0 ? '#065f46' : '#dc2626' }}>
+                    €{stockItems.reduce((total, item) => total + (item.totalProfit || 0), 0).toFixed(2)}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
           <div style={{ marginTop: '15px', textAlign: 'center' }}>

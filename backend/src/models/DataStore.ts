@@ -22,22 +22,22 @@ class DataStore {
     const user = this.users.find(user => user.id === id);
     if (!user) return undefined;
     
-    // Calculate current revenue from stock items (use totalRevenue for new items, totalPrice for backward compatibility)
-    const userRevenue = this.stockItems
-      .filter(item => item.userId === id)
-      .reduce((total, item) => total + (item.totalRevenue || item.totalPrice || 0), 0);
+    // Calculate current revenue and profit from stock items
+    const userItems = this.stockItems.filter(item => item.userId === id);
+    const userRevenue = userItems.reduce((total, item) => total + (item.totalRevenue || item.totalPrice || 0), 0);
+    const userProfit = userItems.reduce((total, item) => total + (item.totalProfit || (item.totalRevenue || item.totalPrice || 0)), 0);
     
-    return { ...user, revenue: userRevenue };
+    return { ...user, revenue: userRevenue, profit: userProfit };
   }
 
   getAllUsers(): User[] {
     return this.users.map(user => {
-      // Calculate current revenue from stock items (use totalRevenue for new items, totalPrice for backward compatibility)
-      const userRevenue = this.stockItems
-        .filter(item => item.userId === user.id)
-        .reduce((total, item) => total + (item.totalRevenue || item.totalPrice || 0), 0);
+      // Calculate current revenue and profit from stock items
+      const userItems = this.stockItems.filter(item => item.userId === user.id);
+      const userRevenue = userItems.reduce((total, item) => total + (item.totalRevenue || item.totalPrice || 0), 0);
+      const userProfit = userItems.reduce((total, item) => total + (item.totalProfit || (item.totalRevenue || item.totalPrice || 0)), 0);
       
-      return { ...user, revenue: userRevenue };
+      return { ...user, revenue: userRevenue, profit: userProfit };
     });
   }
 
@@ -113,8 +113,14 @@ class DataStore {
   }
 
   // New methods for profit tracking and yearly analysis
-  getUserProfitByYear(userId: string): Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> {
-    const userItems = this.stockItems.filter(item => item.userId === userId);
+  getUserProfitByYear(userId: string, typeFilter?: 'berry' | 'mushroom'): Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> {
+    let userItems = this.stockItems.filter(item => item.userId === userId);
+    
+    // Apply type filter if provided
+    if (typeFilter) {
+      userItems = userItems.filter(item => item.type === typeFilter);
+    }
+    
     const yearlyData: Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> = {};
     
     userItems.forEach(item => {
@@ -242,6 +248,71 @@ class DataStore {
       years.add(price.year);
     });
     return Array.from(years).sort((a, b) => b - a); // Most recent first
+  }
+
+  // Get price-based profit analysis (not user-specific, based on market prices)
+  getPriceProfitAnalysis(typeFilter?: 'berry' | 'mushroom'): Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> {
+    let filteredPrices = this.prices;
+    
+    // Apply type filter if provided
+    if (typeFilter) {
+      filteredPrices = filteredPrices.filter(price => price.type === typeFilter);
+    }
+    
+    const yearlyData: Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> = {};
+    
+    filteredPrices.forEach(price => {
+      const year = price.year;
+      if (!yearlyData[year]) {
+        yearlyData[year] = { revenue: 0, cost: 0, profit: 0, itemCount: 0 };
+      }
+      
+      // For price analysis, we calculate theoretical profit per kg
+      const profitPerKg = price.sellPrice - price.buyPrice;
+      
+      // Accumulate data (treating each price entry as representing market data)
+      yearlyData[year].revenue += price.sellPrice;
+      yearlyData[year].cost += price.buyPrice;
+      yearlyData[year].profit += profitPerKg;
+      yearlyData[year].itemCount += 1;  // Count of price entries (species/types tracked)
+    });
+    
+    return yearlyData;
+  }
+
+  // Get all users' sales data aggregated by year for market analysis
+  getAllUsersSalesByYear(typeFilter?: 'berry' | 'mushroom'): { users: Array<{ user: User; salesByYear: Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> }>; totalsByYear: Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> } {
+    const users = this.getAllUsers();
+    const result = {
+      users: [] as Array<{ user: User; salesByYear: Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> }>,
+      totalsByYear: {} as Record<number, { revenue: number; cost: number; profit: number; itemCount: number }>
+    };
+
+    // Get each user's sales data by year
+    users.forEach(user => {
+      const userSales = this.getUserProfitByYear(user.id, typeFilter);
+      result.users.push({
+        user,
+        salesByYear: userSales
+      });
+    });
+
+    // Calculate totals by year across all users
+    result.users.forEach(userEntry => {
+      Object.entries(userEntry.salesByYear).forEach(([year, data]) => {
+        const yearNum = parseInt(year);
+        if (!result.totalsByYear[yearNum]) {
+          result.totalsByYear[yearNum] = { revenue: 0, cost: 0, profit: 0, itemCount: 0 };
+        }
+        
+        result.totalsByYear[yearNum].revenue += data.revenue;
+        result.totalsByYear[yearNum].cost += data.cost;
+        result.totalsByYear[yearNum].profit += data.profit;
+        result.totalsByYear[yearNum].itemCount += data.itemCount;
+      });
+    });
+
+    return result;
   }
 }
 

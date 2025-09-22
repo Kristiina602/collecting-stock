@@ -6,7 +6,8 @@ import {
   updatePrice, 
   deletePrice, 
   getCurrentPrice,
-  getPriceYears
+  getPriceYears,
+  getPriceProfitAnalysis
 } from '../controllers/priceController';
 
 const router = express.Router();
@@ -22,6 +23,9 @@ router.get('/current', getCurrentPrice);
 
 // Get all available years for pricing
 router.get('/years', getPriceYears);
+
+// Get price-based profit analysis
+router.get('/profit-analysis', getPriceProfitAnalysis);
 
 // Get price by ID
 router.get('/:id', getPriceById);

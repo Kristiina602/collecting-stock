@@ -200,6 +200,20 @@ export const deleteStockItem = (req: Request<{ id: string }>, res: Response<ApiR
 export const getUserProfitByYear = (req: Request<{ userId: string }>, res: Response<ApiResponse<any>>) => {
   try {
     const { userId } = req.params;
+    const { type } = req.query;
+    
+    // Validate type filter if provided
+    let typeFilter: 'berry' | 'mushroom' | undefined = undefined;
+    if (type && typeof type === 'string') {
+      if (type === 'berry' || type === 'mushroom') {
+        typeFilter = type;
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: 'Type filter must be either "berry" or "mushroom"'
+        });
+      }
+    }
     
     // Check if user exists
     const user = dataStore.getUserById(userId);
@@ -210,7 +224,7 @@ export const getUserProfitByYear = (req: Request<{ userId: string }>, res: Respo
       });
     }
 
-    const yearlyData = dataStore.getUserProfitByYear(userId);
+    const yearlyData = dataStore.getUserProfitByYear(userId, typeFilter);
     
     res.json({
       success: true,
@@ -231,6 +245,38 @@ export const getAllYears = (req: Request, res: Response<ApiResponse<any>>) => {
     res.json({
       success: true,
       data: years
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+};
+
+// Get all users' sales data aggregated by year for market analysis
+export const getAllUsersSalesByYear = (req: Request, res: Response<ApiResponse<any>>) => {
+  try {
+    const { type } = req.query;
+    
+    // Validate type filter if provided
+    let typeFilter: 'berry' | 'mushroom' | undefined = undefined;
+    if (type && typeof type === 'string') {
+      if (type === 'berry' || type === 'mushroom') {
+        typeFilter = type;
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: 'Type filter must be either "berry" or "mushroom"'
+        });
+      }
+    }
+
+    const salesData = dataStore.getAllUsersSalesByYear(typeFilter);
+    
+    res.json({
+      success: true,
+      data: salesData
     });
   } catch (error) {
     res.status(500).json({

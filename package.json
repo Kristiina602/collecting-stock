@@ -9,6 +9,7 @@
     "start": "concurrently \"cd backend && npm start\" \"cd frontend && npm run preview\""
   },
   "devDependencies": {
+    "@types/express": "^5.0.3",
     "concurrently": "^8.2.2"
   },
   "keywords": [

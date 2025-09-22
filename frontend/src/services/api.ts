@@ -83,8 +83,11 @@ export const stockApi = {
   },
 
   // New profit tracking endpoints
-  getProfitByYear: async (userId: string): Promise<Record<number, { revenue: number; cost: number; profit: number; itemCount: number }>> => {
-    const response = await api.get<ApiResponse<Record<number, { revenue: number; cost: number; profit: number; itemCount: number }>>>(`/stock/profit/${userId}`);
+  getProfitByYear: async (userId: string, type?: 'berry' | 'mushroom'): Promise<Record<number, { revenue: number; cost: number; profit: number; itemCount: number }>> => {
+    const params: any = {};
+    if (type) params.type = type;
+    
+    const response = await api.get<ApiResponse<Record<number, { revenue: number; cost: number; profit: number; itemCount: number }>>>(`/stock/profit/${userId}`, { params });
     if (!response.data.success || !response.data.data) {
       throw new Error(response.data.error || 'Failed to fetch profit data');
     }
@@ -95,6 +98,17 @@ export const stockApi = {
     const response = await api.get<ApiResponse<number[]>>('/stock/years');
     if (!response.data.success || !response.data.data) {
       throw new Error(response.data.error || 'Failed to fetch years');
+    }
+    return response.data.data;
+  },
+
+  getAllUsersSalesByYear: async (type?: 'berry' | 'mushroom'): Promise<{ users: Array<{ user: User; salesByYear: Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> }>; totalsByYear: Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> }> => {
+    const params: any = {};
+    if (type) params.type = type;
+    
+    const response = await api.get<ApiResponse<{ users: Array<{ user: User; salesByYear: Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> }>; totalsByYear: Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> }>>('/stock/sales-by-year', { params });
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || 'Failed to fetch user sales data by year');
     }
     return response.data.data;
   },
@@ -160,6 +174,17 @@ export const priceApi = {
     const response = await api.get<ApiResponse<number[]>>('/prices/years');
     if (!response.data.success || !response.data.data) {
       throw new Error(response.data.error || 'Failed to fetch price years');
+    }
+    return response.data.data;
+  },
+
+  getProfitAnalysis: async (type?: 'berry' | 'mushroom'): Promise<Record<number, { revenue: number; cost: number; profit: number; itemCount: number }>> => {
+    const params: any = {};
+    if (type) params.type = type;
+    
+    const response = await api.get<ApiResponse<Record<number, { revenue: number; cost: number; profit: number; itemCount: number }>>>('/prices/profit-analysis', { params });
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || 'Failed to fetch price profit analysis');
     }
     return response.data.data;
   },

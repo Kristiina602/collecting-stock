@@ -54,9 +54,9 @@ export const StockForm: React.FC<StockFormProps> = ({
       setCurrentPrice(price);
       
       if (price && priceFromMonitoring) {
-        // Convert from €/g to €/kg (multiply by 1000)
-        setBuyPrice((price.buyPrice * 1000).toFixed(2));
-        setSellPrice((price.sellPrice * 1000).toFixed(2));
+        // Prices are already in €/kg
+        setBuyPrice(price.buyPrice.toFixed(2));
+        setSellPrice(price.sellPrice.toFixed(2));
       }
     } catch (err) {
       console.error('Failed to load current price:', err);
@@ -274,7 +274,7 @@ export const StockForm: React.FC<StockFormProps> = ({
           </label>
           {currentPrice && (
             <div style={{ marginTop: '5px', fontSize: '14px', color: '#718096' }}>
-              {t('stock.currentPrices')}: {t('stock.buyPrice')} €{(currentPrice.buyPrice * 1000).toFixed(2)}/kg, {t('stock.sellPrice')} €{(currentPrice.sellPrice * 1000).toFixed(2)}/kg ({t('stock.priceYear')}: {currentPrice.year})
+              {t('stock.currentPrices')}: {t('stock.buyPrice')} €{currentPrice.buyPrice.toFixed(2)}/kg, {t('stock.sellPrice')} €{currentPrice.sellPrice.toFixed(2)}/kg ({t('stock.priceYear')}: {currentPrice.year})
             </div>
           )}
           {!currentPrice && getFinalSpeciesValue() && priceFromMonitoring && (

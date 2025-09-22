@@ -112,7 +112,7 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
             {t('user.currentlyTracking')} <span className="current-user">{selectedUser.aliasName}</span>
           </p>
           <p style={{ color: '#065f46', fontWeight: 'bold' }}>
-            {t('stock.totalRevenue')}: {t('units.currency')}{selectedUser.revenue.toFixed(2)}
+            {t('stock.totalProfit')}: {t('units.currency')}{selectedUser.profit.toFixed(2)}
           </p>
         </div>
       )}

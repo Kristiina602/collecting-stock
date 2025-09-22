@@ -2,11 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { priceApi } from '../services/api';
 import { Price } from '../types';
+import { ProfitDashboard } from '../components/ProfitDashboard';
 
 interface PriceMonitoringPageProps {}
 
 const PriceMonitoringPage: React.FC<PriceMonitoringPageProps> = () => {
   const { t } = useTranslation();
+  
+  // State for profit analysis
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // State for price data
   const [prices, setPrices] = useState<Price[]>([]);
@@ -114,6 +118,8 @@ const PriceMonitoringPage: React.FC<PriceMonitoringPageProps> = () => {
       
       // Reload data
       await Promise.all([loadPrices(), loadAvailableYears()]);
+      // Trigger refresh for profit dashboard
+      setRefreshTrigger(prev => prev + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('messages.errorCreatingPrice'));
     } finally {
@@ -135,6 +141,8 @@ const PriceMonitoringPage: React.FC<PriceMonitoringPageProps> = () => {
       await priceApi.delete(id);
       setSuccess(t('messages.priceDeleted'));
       await Promise.all([loadPrices(), loadAvailableYears()]);
+      // Trigger refresh for profit dashboard
+      setRefreshTrigger(prev => prev + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('messages.errorDeletingPrice'));
     } finally {
@@ -161,6 +169,7 @@ const PriceMonitoringPage: React.FC<PriceMonitoringPageProps> = () => {
 
   return (
     <div className="price-monitoring-page">
+      
       <div className="card">
         <h1>{t('priceMonitoring.title')}</h1>
         <p style={{ marginBottom: '20px', color: '#718096' }}>
@@ -354,8 +363,8 @@ const PriceMonitoringPage: React.FC<PriceMonitoringPageProps> = () => {
                     <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e2e8f0' }}>{t('stock.type')}</th>
                     <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e2e8f0' }}>{t('stock.species')}</th>
                     <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e2e8f0' }}>{t('priceMonitoring.year')}</th>
-                    <th style={{ padding: '12px', textAlign: 'right', borderBottom: '2px solid #e2e8f0' }}>{t('priceMonitoring.buyPrice')} ({t('priceMonitoring.pricePerGram')})</th>
-                    <th style={{ padding: '12px', textAlign: 'right', borderBottom: '2px solid #e2e8f0' }}>{t('priceMonitoring.sellPrice')} ({t('priceMonitoring.pricePerGram')})</th>
+                    <th style={{ padding: '12px', textAlign: 'right', borderBottom: '2px solid #e2e8f0' }}>{t('priceMonitoring.buyPrice')} ({t('priceMonitoring.pricePerKg')})</th>
+                    <th style={{ padding: '12px', textAlign: 'right', borderBottom: '2px solid #e2e8f0' }}>{t('priceMonitoring.sellPrice')} ({t('priceMonitoring.pricePerKg')})</th>
                     <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e2e8f0' }}>{t('priceMonitoring.lastUpdated')}</th>
                     <th style={{ padding: '12px', textAlign: 'center', borderBottom: '2px solid #e2e8f0' }}>{t('common.delete')}</th>
                   </tr>
@@ -402,6 +411,12 @@ const PriceMonitoringPage: React.FC<PriceMonitoringPageProps> = () => {
             </div>
           )}
         </div>
+      </div>
+      
+      <div>
+        <ProfitDashboard 
+          refreshTrigger={refreshTrigger}
+        />
       </div>
     </div>
   );

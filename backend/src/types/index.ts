@@ -3,6 +3,7 @@ export interface User {
   aliasName: string;
   createdAt: Date;
   revenue: number;
+  profit: number;
 }
 
 export interface StockItem {
@@ -51,8 +52,8 @@ export interface Price {
   type: 'berry' | 'mushroom';
   species: string;
   year: number;
-  buyPrice: number;  // €/g buy price
-  sellPrice: number; // €/g sell price
+  buyPrice: number;  // €/kg buy price
+  sellPrice: number; // €/kg sell price
   updatedAt: Date;
 }
 
@@ -60,11 +61,11 @@ export interface CreatePriceRequest {
   type: 'berry' | 'mushroom';
   species: string;
   year: number;
-  buyPrice: number;  // €/g buy price
-  sellPrice: number; // €/g sell price
+  buyPrice: number;  // €/kg buy price
+  sellPrice: number; // €/kg sell price
 }
 
 export interface UpdatePriceRequest {
-  buyPrice?: number;  // €/g buy price
-  sellPrice?: number; // €/g sell price
+  buyPrice?: number;  // €/kg buy price
+  sellPrice?: number; // €/kg sell price
 }

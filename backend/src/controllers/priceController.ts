@@ -239,3 +239,34 @@ export const getPriceYears = (req: Request, res: Response<ApiResponse<any>>) => 
     });
   }
 };
+
+export const getPriceProfitAnalysis = (req: Request, res: Response<ApiResponse<any>>) => {
+  try {
+    const { type } = req.query;
+    
+    // Validate type filter if provided
+    let typeFilter: 'berry' | 'mushroom' | undefined = undefined;
+    if (type && typeof type === 'string') {
+      if (type === 'berry' || type === 'mushroom') {
+        typeFilter = type;
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: 'Type filter must be either "berry" or "mushroom"'
+        });
+      }
+    }
+
+    const profitAnalysis = dataStore.getPriceProfitAnalysis(typeFilter);
+    
+    res.json({
+      success: true,
+      data: profitAnalysis
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+};

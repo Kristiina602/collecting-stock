@@ -12,7 +12,8 @@ class DataStore {
       id: uuidv4(),
       aliasName,
       createdAt: new Date(),
-      revenue: 0
+      revenue: 0,
+      profit: 0
     };
     this.users.push(user);
     return user;

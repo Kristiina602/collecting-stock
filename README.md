@@ -1,11 +1,11 @@
-# Collections Stock
+# Berries and Mushrooms Sales
 
-A web application for tracking and managing your berry and mushroom collections. Built with React TypeScript frontend and Node.js backend.
+A web application for tracking and managing berries and mushrooms sales. Built with React TypeScript frontend and Node.js backend.
 
 ## Features
 
 - **User Management**: Create and manage user accounts
-- **Stock Tracking**: Add, view, and manage collected berries and mushrooms
+- **Stock Tracking**: Add, view, and manage sales of collected berries and mushrooms
 - **Detailed Records**: Track species, quantity, location, collection date, and notes
 - **Modern UI**: Clean, responsive interface with intuitive design
 - **Real-time Updates**: Live data synchronization between frontend and backend

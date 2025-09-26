@@ -15,11 +15,20 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className = 
   const currentLanguage = i18n.language;
 
   return (
-    <div className={`language-switcher ${className}`}>
-      <span className="language-title">{t('language.title')}</span>
+    <div 
+      className={`language-switcher ${className}`}
+      role="group"
+      aria-label={t('language.title')}
+    >
+      <span className="language-title" id="language-switcher-label">
+        {t('language.title')}
+      </span>
       <button
         onClick={() => changeLanguage('en')}
         className={`lang-button ${currentLanguage === 'en' ? 'active' : ''}`}
+        aria-label={t('language.switchToEnglish')}
+        aria-pressed={currentLanguage === 'en'}
+        aria-describedby="language-switcher-label"
         title={t('language.switchToEnglish')}
       >
         {t('language.english')}
@@ -27,6 +36,9 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className = 
       <button
         onClick={() => changeLanguage('fi')}
         className={`lang-button ${currentLanguage === 'fi' ? 'active' : ''}`}
+        aria-label={t('language.switchToFinnish')}
+        aria-pressed={currentLanguage === 'fi'}
+        aria-describedby="language-switcher-label"
         title={t('language.switchToFinnish')}
       >
         {t('language.finnish')}

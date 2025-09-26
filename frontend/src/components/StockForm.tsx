@@ -20,7 +20,6 @@ export const StockForm: React.FC<StockFormProps> = ({
   const [unitPrice, setUnitPrice] = useState('');
   const [buyPrice, setBuyPrice] = useState('');
   const [sellPrice, setSellPrice] = useState('');
-  const [location, setLocation] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +86,7 @@ export const StockForm: React.FC<StockFormProps> = ({
     }
 
     const finalSpecies = getFinalSpeciesValue();
-    if (!finalSpecies || !quantity || (!unitPrice && !sellPrice) || !location.trim()) {
+    if (!finalSpecies || !quantity || (!unitPrice && !sellPrice)) {
       setError(t('messages.allFieldsRequired'));
       return;
     }
@@ -137,7 +136,6 @@ export const StockForm: React.FC<StockFormProps> = ({
         unitPrice: unitPriceNum,
         buyPrice: buyPriceNum,
         sellPrice: sellPriceNum || unitPriceNum || 0,
-        location: location.trim(),
         notes: notes.trim() || undefined,
       });
 
@@ -150,7 +148,6 @@ export const StockForm: React.FC<StockFormProps> = ({
       setUnitPrice('');
       setBuyPrice('');
       setSellPrice('');
-      setLocation('');
       setNotes('');
       
       onStockItemCreated();
@@ -176,18 +173,26 @@ export const StockForm: React.FC<StockFormProps> = ({
   }
 
   return (
-    <div className="card">
-      <h2>
+    <section className="card" aria-labelledby="stock-form-heading">
+      <h2 id="stock-form-heading">
         {t('stock.addItem')}
       </h2>
       <p style={{ marginBottom: '20px', color: '#718096' }}>
         {t('user.addingItemsFor')}: <span className="current-user">{selectedUser.aliasName}</span>
       </p>
       
-      {error && <div className="error">{error}</div>}
-      {success && <div className="success">{success}</div>}
+      {error && (
+        <div className="error" role="alert" aria-live="assertive" aria-atomic="true">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="success" role="status" aria-live="polite" aria-atomic="true">
+          {success}
+        </div>
+      )}
       
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <div className="form-group">
           <label htmlFor="type">{t('stock.type')}</label>
           <select
@@ -200,10 +205,15 @@ export const StockForm: React.FC<StockFormProps> = ({
               setCustomSpecies(''); // Reset custom species too
             }}
             disabled={loading}
+            aria-describedby="type-description"
+            required
           >
             <option value="berry">{t('stock.berry')}</option>
             <option value="mushroom">{t('stock.mushroom')}</option>
           </select>
+          <div id="type-description" className="sr-only">
+            {t('stock.typeDescription')}
+          </div>
         </div>
 
         <div className="form-group">
@@ -219,6 +229,9 @@ export const StockForm: React.FC<StockFormProps> = ({
               }
             }}
             disabled={loading}
+            aria-describedby="species-description"
+            required
+            aria-invalid={!getFinalSpeciesValue() ? 'true' : 'false'}
           >
             <option value="">{type === 'berry' ? t('placeholders.berrySpecies') : t('placeholders.mushroomSpecies')}</option>
             {getSpeciesOptions().map(([key, value]) => (
@@ -227,6 +240,9 @@ export const StockForm: React.FC<StockFormProps> = ({
               </option>
             ))}
           </select>
+          <div id="species-description" className="sr-only">
+            {t('stock.speciesDescription')}
+          </div>
           {species === 'other' && (
             <input
               type="text"
@@ -236,6 +252,8 @@ export const StockForm: React.FC<StockFormProps> = ({
               onChange={(e) => setCustomSpecies(e.target.value)}
               placeholder={t('placeholders.customSpecies')}
               disabled={loading}
+              aria-label={t('stock.customSpeciesLabel')}
+              required
             />
           )}
         </div>
@@ -252,7 +270,13 @@ export const StockForm: React.FC<StockFormProps> = ({
             step="0.1"
             min="0"
             disabled={loading}
+            required
+            aria-describedby="quantity-description"
+            aria-invalid={!quantity || parseFloat(quantity) <= 0 ? 'true' : 'false'}
           />
+          <div id="quantity-description" className="sr-only">
+            {t('stock.quantityDescription')}
+          </div>
         </div>
 
         {/* Price source toggle */}
@@ -347,18 +371,6 @@ export const StockForm: React.FC<StockFormProps> = ({
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="location">{t('stock.locationRequired')}</label>
-          <input
-            type="text"
-            id="location"
-            className="form-control"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder={t('placeholders.location')}
-            disabled={loading}
-          />
-        </div>
 
         <div className="form-group">
           <label htmlFor="notes">{t('stock.notesOptional')}</label>
@@ -376,7 +388,8 @@ export const StockForm: React.FC<StockFormProps> = ({
         <button 
           type="submit" 
           className="btn icon-with-text" 
-          disabled={loading || !getFinalSpeciesValue() || !quantity || (!unitPrice && !sellPrice) || !location.trim()}
+          disabled={loading || !getFinalSpeciesValue() || !quantity || (!unitPrice && !sellPrice)}
+          aria-describedby="submit-button-description"
         >
           {loading ? (
             t('messages.loading')
@@ -384,7 +397,10 @@ export const StockForm: React.FC<StockFormProps> = ({
             t('stock.addStockButton')
           )}
         </button>
+        <div id="submit-button-description" className="sr-only">
+          {t('stock.submitButtonDescription')}
+        </div>
       </form>
-    </div>
+    </section>
   );
 };

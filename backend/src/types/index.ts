@@ -19,7 +19,6 @@ export interface StockItem {
   totalCost: number;    // calculated from quantity * buyPrice / 1000
   totalProfit: number;  // calculated from totalRevenue - totalCost
   totalPrice: number;   // Deprecated, kept for backward compatibility
-  location: string;
   collectedAt: Date;
   notes?: string;
 }
@@ -43,7 +42,6 @@ export interface CreateStockItemRequest {
   unitPrice?: number; // Deprecated, use sellPrice
   buyPrice: number;   // €/kg buy price
   sellPrice: number;  // €/kg sell price
-  location: string;
   notes?: string;
 }
 

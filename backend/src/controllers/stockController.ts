@@ -4,13 +4,13 @@ import { ApiResponse, CreateStockItemRequest } from '../types';
 
 export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockItemRequest>, res: Response<ApiResponse<any>>) => {
   try {
-    const { userId, type, species, quantity, unitPrice, buyPrice, sellPrice, location, notes } = req.body;
+    const { userId, type, species, quantity, unitPrice, buyPrice, sellPrice, notes } = req.body;
 
     // Validation - support both old API (unitPrice) and new API (buyPrice + sellPrice)
-    if (!userId || !type || !species || !quantity || !location) {
+    if (!userId || !type || !species || !quantity) {
       return res.status(400).json({
         success: false,
-        error: 'All required fields must be provided: userId, type, species, quantity, location'
+        error: 'All required fields must be provided: userId, type, species, quantity'
       });
     }
 
@@ -80,7 +80,6 @@ export const createStockItem = (req: Request<{}, ApiResponse<any>, CreateStockIt
       unitPrice: finalUnitPrice,
       buyPrice: finalBuyPrice,
       sellPrice: finalSellPrice,
-      location: location.trim(),
       notes: notes?.trim()
     });
     

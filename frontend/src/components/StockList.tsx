@@ -100,8 +100,8 @@ export const StockList: React.FC<StockListProps> = ({
   }
 
   return (
-    <div className="card">
-      <h2>
+    <section className="card" aria-labelledby="stock-list-heading">
+      <h2 id="stock-list-heading">
         {t('stock.yourCollections')}
       </h2>
       <p style={{ marginBottom: '20px', color: '#718096' }}>
@@ -119,6 +119,7 @@ export const StockList: React.FC<StockListProps> = ({
             value={selectedYear || ''}
             onChange={(e) => setSelectedYear(e.target.value ? parseInt(e.target.value, 10) : null)}
             style={{ width: '200px' }}
+            aria-describedby="year-filter-description"
           >
             <option value="">{t('stock.allYears')}</option>
             {availableYears.map(year => (
@@ -127,13 +128,20 @@ export const StockList: React.FC<StockListProps> = ({
               </option>
             ))}
           </select>
+          <div id="year-filter-description" className="sr-only">
+            {t('stock.yearFilterDescription')}
+          </div>
         </div>
       )}
       
-      {error && <div className="error">{error}</div>}
+      {error && (
+        <div className="error" role="alert" aria-live="assertive">
+          {error}
+        </div>
+      )}
       
       {loading ? (
-        <div className="empty-state">
+        <div className="empty-state" role="status" aria-live="polite">
           <p>{t('stock.loadingCollections')}</p>
         </div>
       ) : stockItems.length === 0 ? (
@@ -142,14 +150,16 @@ export const StockList: React.FC<StockListProps> = ({
           <p>{t('stock.startAddingCollections')}</p>
         </div>
       ) : (
-        <div className="stock-list">
+        <div className="stock-list" role="list" aria-label={t('stock.stockItemsList')}>
           {stockItems.map(item => (
-            <div 
+            <article 
               key={item.id} 
               className={`stock-item ${item.type}`}
+              role="listitem"
+              aria-labelledby={`item-title-${item.id}`}
             >
               <div className="stock-item-info">
-                <h4>
+                <h4 id={`item-title-${item.id}`}>
                   {item.species}
                 </h4>
                 <p><strong>{t('stock.quantityLabel')}</strong> {item.quantity} {t('units.grams')}</p>
@@ -174,7 +184,6 @@ export const StockList: React.FC<StockListProps> = ({
                     <strong>{t('stock.totalProfitLabel')}</strong> €{item.totalProfit.toFixed(2)}
                   </p>
                 )}
-                <p><strong>{t('stock.locationLabel')}</strong> {item.location}</p>
                 <p><strong>{t('stock.collectedLabel')}</strong> {formatDate(item.collectedAt)}</p>
                 {item.notes && <p><strong>{t('stock.notesLabel')}</strong> {item.notes}</p>}
               </div>
@@ -183,26 +192,31 @@ export const StockList: React.FC<StockListProps> = ({
                 <button 
                   className="btn btn-small btn-danger icon-with-text"
                   onClick={() => handleDelete(item.id)}
-                  title="Delete this item"
+                  aria-label={t('stock.deleteItem', { species: item.species })}
+                  title={t('stock.deleteItem', { species: item.species })}
                 >
-                  <Icon name="trash" size={14} />
+                  <Icon name="trash" size={14} aria-hidden="true" />
                   {t('common.delete')}
                 </button>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       )}
       
       {stockItems.length > 0 && (
         <>
-          <div style={{ 
-            marginTop: '20px', 
-            padding: '15px', 
-            backgroundColor: '#f7fafc', 
-            borderRadius: '6px',
-            border: '1px solid #e2e8f0'
-          }}>
+          <section 
+            style={{ 
+              marginTop: '20px', 
+              padding: '15px', 
+              backgroundColor: '#f7fafc', 
+              borderRadius: '6px',
+              border: '1px solid #e2e8f0'
+            }}
+            aria-labelledby="summary-heading"
+          >
+            <h3 id="summary-heading" className="sr-only">{t('stock.summaryStatistics')}</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px', textAlign: 'center' }}>
               <div>
                 <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('stock.totalItems')}</p>
@@ -233,19 +247,20 @@ export const StockList: React.FC<StockListProps> = ({
                 </div>
               )}
             </div>
-          </div>
+          </section>
           <div style={{ marginTop: '15px', textAlign: 'center' }}>
             <button 
               className="btn btn-secondary btn-small icon-with-text" 
               onClick={loadStockItems}
               disabled={loading}
+              aria-label={t('stock.refreshStockList')}
             >
-              <Icon name="refresh" size={14} />
+              <Icon name="refresh" size={14} aria-hidden="true" />
               {loading ? t('stock.refreshing') : t('stock.refresh')}
             </button>
           </div>
         </>
       )}
-    </div>
+    </section>
   );
 };

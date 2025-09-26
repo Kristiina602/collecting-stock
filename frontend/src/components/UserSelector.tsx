@@ -70,33 +70,45 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
 
   if (loading) {
     return (
-      <div className="card">
-        <h2>{t('user.selectActiveUser')}</h2>
-        {t('messages.loadingUsers')}
-      </div>
+      <section className="card" aria-labelledby="user-selector-heading-loading">
+        <h2 id="user-selector-heading-loading">{t('user.selectActiveUser')}</h2>
+        <div role="status" aria-live="polite">
+          {t('messages.loadingUsers')}
+        </div>
+      </section>
     );
   }
 
   if (error) {
     return (
-      <div className="card">
-        <h2>{t('user.selectActiveUser')}</h2>
-        <div className="error">{error}</div>
-        <button className="btn btn-small" onClick={refreshUsers}>
+      <section className="card" aria-labelledby="user-selector-heading-error">
+        <h2 id="user-selector-heading-error">{t('user.selectActiveUser')}</h2>
+        <div className="error" role="alert" aria-live="assertive">
+          {error}
+        </div>
+        <button 
+          className="btn btn-small" 
+          onClick={refreshUsers}
+          aria-label={t('messages.tryAgainDescription')}
+        >
           {t('messages.tryAgain')}
         </button>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="card">
-      <h2>{t('user.selectActiveUser')}</h2>
+    <section className="card" aria-labelledby="user-selector-heading">
+      <h2 id="user-selector-heading">{t('user.selectActiveUser')}</h2>
+      <label htmlFor="userSelect" className="sr-only">
+        {t('user.selectActiveUser')}
+      </label>
       <select
         id="userSelect"
         className="form-control"
         value={selectedUser?.id || ''}
         onChange={handleUserChange}
+        aria-describedby="user-selector-description"
       >
         <option value="">{t('user.selectUserPlaceholder')}</option>
         {users.map(user => (
@@ -105,9 +117,12 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
           </option>
         ))}
       </select>
+      <div id="user-selector-description" className="sr-only">
+        {t('user.userSelectorDescription')}
+      </div>
       
       {selectedUser && (
-        <div style={{ marginTop: '10px' }}>
+        <div style={{ marginTop: '10px' }} role="status" aria-live="polite">
           <p>
             {t('user.currentlyTracking')} <span className="current-user">{selectedUser.aliasName}</span>
           </p>
@@ -121,9 +136,10 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
         className="btn btn-small btn-secondary" 
         onClick={refreshUsers}
         style={{ marginTop: '10px' }}
+        aria-label={t('user.refreshUsersDescription')}
       >
         {t('user.refreshUsers')}
       </button>
-    </div>
+    </section>
   );
 };

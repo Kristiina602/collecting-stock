@@ -3,17 +3,21 @@
     "title": "Marjastus ja sienestys kauppa",
     "subtitle": "Seuraa marjojen ja sienten myyntiä helposti",
     "welcome": "Tervetuloa marjastus ja sienestys kauppaan",
-    "welcomeDescription": "Hinnat ja Myynnit -sivuilla voit hallinnoida marja- ja sienikauppaa käyttäjätilin luomisen jälkeen."
+    "welcomeDescription": "Hinnat ja Myynnit -sivuilla voit hallinnoida marja- ja sienikauppaa käyttäjätilin luomisen jälkeen.",
+    "mainContent": "Sovelluksen pääsisältö"
   },
   "navigation": {
     "home": "Koti",
     "collections": "Myynnit",
     "priceMonitoring": "Hinnat",
     "goToCollections": "Siirry myyntiin",
-    "goToHome": "Siirry kotiin"
+    "goToHome": "Siirry kotiin",
+    "mainNavigation": "Päänavigaatio",
+    "accountActions": "Tilin toiminnot"
   },
   "user": {
     "createAccount": "Luo käyttäjätili",
+    "createAccountDescription": "Luo uusi käyttäjätili aloittaaksesi marja- ja sienimyyntien seurannan.",
     "login": "Kirjaudu sisään",
     "loginButton": "Kirjaudu sisään",
     "loginTitle": "Kirjaudu tilillesi",
@@ -27,7 +31,9 @@
     "selectActiveUser": "Valitse käyttäjä",
     "currentlyTracking": "Seurataan myyntejä käyttäjälle:",
     "refreshUsers": "Päivitä käyttäjät",
-    "addingItemsFor": "Lisätään myyntejä käyttäjälle"
+    "refreshUsersDescription": "Päivitä saatavilla olevien käyttäjien luettelo",
+    "addingItemsFor": "Lisätään myyntejä käyttäjälle",
+    "userSelectorDescription": "Valitse käyttäjä nähdäksesi ja hallitaksesi hänen myyntitietojaan"
   },
   "stock": {
     "addItem": "Lisää myynti",
@@ -44,8 +50,6 @@
     "buyPriceRequired": "Ostohinta (€/kg) *",
     "sellPrice": "Myyntihinta",
     "sellPriceRequired": "Myyntihinta (€/kg) *",
-    "location": "Sijainti",
-    "locationRequired": "Sijainti *",
     "notes": "Muistiinpanot",
     "notesOptional": "Muistiinpanot (vapaaehtoinen)",
     "addStockButton": "Lisää myynti",
@@ -70,7 +74,6 @@
     "totalCostLabel": "Kokonaiskulut:",
     "totalProfitLabel": "Kokonaisvoitto:",
     "profitMarginLabel": "Tuottomarginaali:",
-    "locationLabel": "Sijainti:",
     "collectedLabel": "Myyty:",
     "notesLabel": "Muistiinpanot:",
     "confirmDelete": "Oletko varma, että haluat poistaa tämän myynnin?",
@@ -81,8 +84,17 @@
     "profitMargin": "Tuottomarginaali",
     "refresh": "Päivitä",
     "refreshing": "Päivitetään...",
+    "refreshStockList": "Päivitä varastoluettelo",
     "yearFilter": "Suodata vuoden mukaan",
     "allYears": "Kaikki vuodet",
+    "yearFilterDescription": "Suodata tuotteet keräysvuoden mukaan",
+    "summaryStatistics": "Yhteenvetotilastot",
+    "stockItemsList": "Varastotuotteiden luettelo",
+    "typeDescription": "Valitse kerätyn tuotteen tyyppi",
+    "speciesDescription": "Valitse marjan tai sienen laji",
+    "customSpeciesLabel": "Mukautettu lajin nimi",
+    "quantityDescription": "Syötä määrä grammoina",
+    "submitButtonDescription": "Lähetä lomake lisätäksesi uuden varastotuotteen",
     "profitAnalysis": "Tuottoanalyysi",
     "yearlyProfits": "Vuosittaiset tuotot",
     "showProfitBreakdown": "Näytä tuottoerittely",
@@ -99,7 +111,6 @@
     "unitPrice": " ",
     "buyPrice": "Ostohinta per kg",
     "sellPrice": "Myyntihinta per kg",
-    "location": "esim. Metsä järven lähellä",
     "notes": "Mahdolliset lisätiedot..."
   },
   "species": { 
@@ -130,7 +141,7 @@
   },
   "messages": {
     "selectUserFirst": "Valitse ensin käyttäjä",
-    "allFieldsRequired": "Laji, määrä, hinnat ja sijainti tietojen antaminen on tarvittavaa. Muistiinpanot ovat valinnaisia.",
+    "allFieldsRequired": "Laji, määrä ja hinnat tietojen antaminen on tarvittavaa. Muistiinpanot ovat valinnaisia.",
     "quantityPositive": "Määrän täytyy olla positiivinen luku",
     "unitPriceNonNegative": "Hinnan täytyy olla ei-negatiivinen luku",
     "buyPriceNonNegative": "Ostohinnan täytyy olla ei-negatiivinen luku",
@@ -148,6 +159,7 @@
     "loading": "Ladataan...",
     "loadingUsers": "Ladataan käyttäjiä...",
     "tryAgain": "Yritä uudelleen",
+    "tryAgainDescription": "Yritä ladata käyttäjät uudelleen",
     "priceCreated": "Hinta luotu/päivitetty onnistuneesti!",
     "errorCreatingPrice": "Virhe hinnan luomisessa/päivittämisessä",
     "priceDeleted": "Hinta poistettu onnistuneesti!",

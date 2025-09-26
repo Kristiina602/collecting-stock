@@ -56,17 +56,6 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
     }
   };
 
-  // Refresh users list when a new user might have been created
-  const refreshUsers = () => {
-    loadUsers();
-  };
-
-  // Expose refresh function to parent component
-  React.useEffect(() => {
-    if (users.length === 0) {
-      refreshUsers();
-    }
-  }, []);
 
   if (loading) {
     return (
@@ -88,7 +77,7 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
         </div>
         <button 
           className="btn btn-small" 
-          onClick={refreshUsers}
+          onClick={loadUsers}
           aria-label={t('messages.tryAgainDescription')}
         >
           {t('messages.tryAgain')}
@@ -98,9 +87,8 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
   }
 
   return (
-    <section className="card" aria-labelledby="user-selector-heading">
-      <h2 id="user-selector-heading">{t('user.selectActiveUser')}</h2>
-      <label htmlFor="userSelect" className="sr-only">
+    <section className="card">
+      <label htmlFor="userSelect">
         {t('user.selectActiveUser')}
       </label>
       <select
@@ -108,7 +96,6 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
         className="form-control"
         value={selectedUser?.id || ''}
         onChange={handleUserChange}
-        aria-describedby="user-selector-description"
       >
         <option value="">{t('user.selectUserPlaceholder')}</option>
         {users.map(user => (
@@ -117,29 +104,6 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
           </option>
         ))}
       </select>
-      <div id="user-selector-description" className="sr-only">
-        {t('user.userSelectorDescription')}
-      </div>
-      
-      {selectedUser && (
-        <div style={{ marginTop: '10px' }} role="status" aria-live="polite">
-          <p>
-            {t('user.currentlyTracking')} <span className="current-user">{selectedUser.aliasName}</span>
-          </p>
-          <p style={{ color: '#065f46', fontWeight: 'bold' }}>
-            {t('stock.totalProfit')}: {t('units.currency')}{selectedUser.profit.toFixed(2)}
-          </p>
-        </div>
-      )}
-      
-      <button 
-        className="btn btn-small btn-secondary" 
-        onClick={refreshUsers}
-        style={{ marginTop: '10px' }}
-        aria-label={t('user.refreshUsersDescription')}
-      >
-        {t('user.refreshUsers')}
-      </button>
     </section>
   );
 };

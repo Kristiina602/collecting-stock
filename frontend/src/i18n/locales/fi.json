@@ -9,8 +9,11 @@
   "navigation": {
     "home": "Koti",
     "collections": "Myynnit",
+    "buys": "Ostot",
     "priceMonitoring": "Hinnat",
+    "balance": "Tuotto",
     "goToCollections": "Siirry myyntiin",
+    "goToBuys": "Siirry ostoihin",
     "goToHome": "Siirry kotiin",
     "mainNavigation": "Päänavigaatio",
     "accountActions": "Tilin toiminnot"
@@ -141,7 +144,7 @@
   },
   "messages": {
     "selectUserFirst": "Valitse ensin käyttäjä",
-    "allFieldsRequired": "Laji, määrä ja hinnat tietojen antaminen on tarvittavaa. Muistiinpanot ovat valinnaisia.",
+    "allFieldsRequired": "Laji, määrä ja hinnat ovat pakollisia. Muistiinpanot ovat valinnaisia.",
     "quantityPositive": "Määrän täytyy olla positiivinen luku",
     "unitPriceNonNegative": "Hinnan täytyy olla ei-negatiivinen luku",
     "buyPriceNonNegative": "Ostohinnan täytyy olla ei-negatiivinen luku",
@@ -168,7 +171,15 @@
     "yearRequired": "Vuosi vaaditaan",
     "buyPriceRequired": "Ostohinta vaaditaan",
     "sellPriceRequired": "Myyntihinta vaaditaan",
-    "confirmDeletePrice": "Oletko varma, että haluat poistaa tämän hintatiedon?"
+    "confirmDeletePrice": "Oletko varma, että haluat poistaa tämän hintatiedon?",
+    "buyFormFieldsRequired": "Laji, määrä ja ostohinta ovat pakollisia. Muistiinpanot ovat valinnaisia.",
+    "buyItemCreated": "Osto kirjattu onnistuneesti!",
+    "errorCreatingBuy": "Virhe oston luomisessa",
+    "failedToLoadBuys": "Ostojen lataaminen epäonnistui",
+    "failedToDeleteBuy": "Oston poistaminen epäonnistui",
+    "salesFormFieldsRequired": "Laji, määrä ja myyntihinta ovat pakollisia. Muistiinpanot ovat valinnaisia.",
+    "noInventoryAvailable": "Ei varastoa saatavilla tuotteelle {{species}}. Osta tämä tuote ensin ennen kuin yrität myydä sitä.",
+    "insufficientInventory": "Riittämätön varasto tuotteelle {{species}}. Yrität myydä {{requested}}g mutta sinulla on vain {{available}}g saatavilla."
   },
   "units": {
     "grams": "g",
@@ -216,6 +227,31 @@
     "speciesFilter": "Suodata lajin mukaan",
     "allSpecies": "Kaikki lajit"
   },
+  "buys": {
+    "addItem": "Lisää osto",
+    "yourPurchases": "Sinun ostot",
+    "showingPurchasesFor": "Näytetään ostot käyttäjälle:",
+    "loadingPurchases": "Ladataan ostoja...",
+    "noPurchasesYet": "Ei ostoja vielä",
+    "startAddingPurchases": "Aloita marjojen ja sienten osto!",
+    "buyPriceRequired": "Ostohinta (€/kg) *",
+    "buyPriceLabel": "Ostohinta:",
+    "totalCostLabel": "Kokonaiskulut:",
+    "purchasedLabel": "Ostettu:",
+    "confirmDelete": "Oletko varma, että haluat poistaa tämän oston?",
+    "deleteItem": "Poista tämä osto",
+    "addingItemsFor": "Lisätään ostoja käyttäjälle:",
+    "addBuyButton": "Lisää osto",
+    "usePriceMonitoring": "Käytä ostohintooja Hintojen Seurannasta (suositeltu)",
+    "currentBuyPrice": "Nykyinen ostohinta",
+    "totalItems": "Tuotteiden määrä",
+    "totalCost": "Kokonaiskulut",
+    "totalQuantity": "Kokonaismäärä",
+    "summaryStatistics": "Ostojen yhteenvetotilastot",
+    "buyItemsList": "Ostettujen tuotteiden luettelo",
+    "refreshBuyList": "Päivitä ostoluettelo",
+    "selectUserToView": "Valitse käyttäjä nähdäksesi ostohistorian"
+  },
   "userSalesTable": {
     "title": "Käyttäjien myyntitiedot",
     "userName": "Käyttäjä",
@@ -228,5 +264,9 @@
     "allUsers": "Kaikki käyttäjät",
     "noSalesData": "Ei myyntitietoja saatavilla",
     "addCollectionsToSee": "Lisää keräyksiä nähdäksesi käyttäjien myyntianalyysin"
+  },
+  "balance": {
+    "title": "Tuotto",
+    "subtitle": "Kattava tuottoanalyysi ja markkinakatsaus"
   }
 }

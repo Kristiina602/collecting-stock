@@ -2,15 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { priceApi } from '../services/api';
 import { Price } from '../types';
-import { ProfitDashboard } from '../components/ProfitDashboard';
 
 interface PriceMonitoringPageProps {}
 
 const PriceMonitoringPage: React.FC<PriceMonitoringPageProps> = () => {
   const { t } = useTranslation();
-  
-  // State for profit analysis
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // State for price data
   const [prices, setPrices] = useState<Price[]>([]);
@@ -118,8 +114,6 @@ const PriceMonitoringPage: React.FC<PriceMonitoringPageProps> = () => {
       
       // Reload data
       await Promise.all([loadPrices(), loadAvailableYears()]);
-      // Trigger refresh for profit dashboard
-      setRefreshTrigger(prev => prev + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('messages.errorCreatingPrice'));
     } finally {
@@ -141,8 +135,6 @@ const PriceMonitoringPage: React.FC<PriceMonitoringPageProps> = () => {
       await priceApi.delete(id);
       setSuccess(t('messages.priceDeleted'));
       await Promise.all([loadPrices(), loadAvailableYears()]);
-      // Trigger refresh for profit dashboard
-      setRefreshTrigger(prev => prev + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('messages.errorDeletingPrice'));
     } finally {
@@ -411,12 +403,6 @@ const PriceMonitoringPage: React.FC<PriceMonitoringPageProps> = () => {
             </div>
           )}
         </div>
-      </div>
-      
-      <div>
-        <ProfitDashboard 
-          refreshTrigger={refreshTrigger}
-        />
       </div>
     </div>
   );

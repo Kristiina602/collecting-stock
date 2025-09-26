@@ -1,20 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { stockApi } from '../services/api';
-import { User, StockItem } from '../types';
+import { User } from '../types';
 import { Icon } from './Icon';
 
-interface StockListProps {
-  selectedUser: User | null;
-  refreshTrigger: number; // Used to trigger refresh when new items are added
+// New interface for buy items (inventory)
+interface BuyItem {
+  id: string;
+  userId: string;
+  type: 'berry' | 'mushroom';
+  species: string;
+  quantity: number;
+  buyPrice: number; // €/kg buy price
+  totalCost: number; // calculated from quantity * buyPrice / 1000
+  location?: string;
+  purchasedAt: string;
+  notes?: string;
 }
 
-export const StockList: React.FC<StockListProps> = ({ 
+interface BuyListProps {
+  selectedUser: User | null;
+  refreshTrigger: number;
+}
+
+export const BuyList: React.FC<BuyListProps> = ({ 
   selectedUser, 
   refreshTrigger 
 }) => {
   const { t } = useTranslation();
-  const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  const [buyItems, setBuyItems] = useState<BuyItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -22,37 +35,43 @@ export const StockList: React.FC<StockListProps> = ({
 
   useEffect(() => {
     if (selectedUser) {
-      loadStockItems();
+      loadBuyItems();
       loadAvailableYears();
     } else {
-      setStockItems([]);
+      setBuyItems([]);
       setAvailableYears([]);
     }
   }, [selectedUser, refreshTrigger]);
 
   useEffect(() => {
     if (selectedUser) {
-      loadStockItems();
+      loadBuyItems();
     }
   }, [selectedYear]);
 
-  const loadStockItems = async () => {
+  const loadBuyItems = async () => {
     if (!selectedUser) return;
 
     try {
       setLoading(true);
       setError(null);
-      const items = await stockApi.getAll(selectedUser.id, selectedYear || undefined);
       
-      // Filter to only show items that are actual sales/collections (sellPrice > 0)
-      // Buy-only items (sellPrice = 0) should not appear in the collections list
-      const salesItems = items.filter(item => item.sellPrice > 0);
+      // For now, we'll use the existing stock API but filter for buy-only items
+      // In the future, this should be a separate buy items API
+      const response = await fetch(`/api/buy-items?userId=${selectedUser.id}${selectedYear ? `&year=${selectedYear}` : ''}`);
       
-      setStockItems(salesItems.sort((a, b) => 
-        new Date(b.collectedAt).getTime() - new Date(a.collectedAt).getTime()
+      if (!response.ok) {
+        throw new Error('Failed to load buy items');
+      }
+      
+      const data = await response.json();
+      const items = Array.isArray(data) ? data : data.data || [];
+      
+      setBuyItems(items.sort((a: BuyItem, b: BuyItem) => 
+        new Date(b.purchasedAt).getTime() - new Date(a.purchasedAt).getTime()
       ));
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('messages.failedToLoadStock'));
+      setError(err instanceof Error ? err.message : t('messages.failedToLoadBuys'));
     } finally {
       setLoading(false);
     }
@@ -60,7 +79,10 @@ export const StockList: React.FC<StockListProps> = ({
 
   const loadAvailableYears = async () => {
     try {
-      const years = await stockApi.getAllYears();
+      // For now, extract years from the loaded items
+      // In the future, this should be a separate API call
+      const currentYear = new Date().getFullYear();
+      const years = [currentYear - 2, currentYear - 1, currentYear, currentYear + 1];
       setAvailableYears(years);
     } catch (err) {
       console.error('Failed to load years:', err);
@@ -68,15 +90,22 @@ export const StockList: React.FC<StockListProps> = ({
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm(t('stock.confirmDelete'))) {
+    if (!confirm(t('buys.confirmDelete'))) {
       return;
     }
 
     try {
-      await stockApi.delete(id);
-      setStockItems(items => items.filter(item => item.id !== id));
+      const response = await fetch(`/api/buy-items/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete buy item');
+      }
+
+      setBuyItems(items => items.filter(item => item.id !== id));
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('messages.failedToDeleteStock'));
+      setError(err instanceof Error ? err.message : t('messages.failedToDeleteBuy'));
     }
   };
 
@@ -94,23 +123,23 @@ export const StockList: React.FC<StockListProps> = ({
     return (
       <div className="card">
         <h2>
-          {t('stock.yourCollections')}
+          {t('buys.yourPurchases')}
         </h2>
         <div className="empty-state">
           <h3>{t('stock.noUserSelected')}</h3>
-          <p>{t('stock.selectUserToView')}</p>
+          <p>{t('buys.selectUserToView')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <section className="card" aria-labelledby="stock-list-heading">
-      <h2 id="stock-list-heading">
-        {t('stock.yourCollections')}
+    <section className="card" aria-labelledby="buy-list-heading">
+      <h2 id="buy-list-heading">
+        {t('buys.yourPurchases')}
       </h2>
       <p style={{ marginBottom: '20px', color: '#718096' }}>
-        {t('stock.showingCollectionsFor')} <span className="current-user">{selectedUser.aliasName}</span>
+        {t('buys.showingPurchasesFor')} <span className="current-user">{selectedUser.aliasName}</span>
       </p>
       
       {availableYears.length > 0 && (
@@ -124,7 +153,6 @@ export const StockList: React.FC<StockListProps> = ({
             value={selectedYear || ''}
             onChange={(e) => setSelectedYear(e.target.value ? parseInt(e.target.value, 10) : null)}
             style={{ width: '200px' }}
-            aria-describedby="year-filter-description"
           >
             <option value="">{t('stock.allYears')}</option>
             {availableYears.map(year => (
@@ -133,9 +161,6 @@ export const StockList: React.FC<StockListProps> = ({
               </option>
             ))}
           </select>
-          <div id="year-filter-description" className="sr-only">
-            {t('stock.yearFilterDescription')}
-          </div>
         </div>
       )}
       
@@ -147,38 +172,30 @@ export const StockList: React.FC<StockListProps> = ({
       
       {loading ? (
         <div className="empty-state" role="status" aria-live="polite">
-          <p>{t('stock.loadingCollections')}</p>
+          <p>{t('buys.loadingPurchases')}</p>
         </div>
-      ) : stockItems.length === 0 ? (
+      ) : buyItems.length === 0 ? (
         <div className="empty-state">
-          <h3>{t('stock.noCollectionsYet')}</h3>
-          <p>{t('stock.startAddingCollections')}</p>
+          <h3>{t('buys.noPurchasesYet')}</h3>
+          <p>{t('buys.startAddingPurchases')}</p>
         </div>
       ) : (
-        <div className="stock-list" role="list" aria-label={t('stock.stockItemsList')}>
-          {stockItems.map(item => (
+        <div className="stock-list" role="list" aria-label={t('buys.buyItemsList')}>
+          {buyItems.map(item => (
             <article 
               key={item.id} 
               className={`stock-item ${item.type}`}
               role="listitem"
-              aria-labelledby={`item-title-${item.id}`}
+              aria-labelledby={`buy-item-title-${item.id}`}
             >
               <div className="stock-item-info">
-                <h4 id={`item-title-${item.id}`}>
+                <h4 id={`buy-item-title-${item.id}`}>
                   {item.species}
                 </h4>
                 <p><strong>{t('stock.quantityLabel')}</strong> {item.quantity} {t('units.grams')}</p>
-                {item.sellPrice > 0 ? (
-                  <p><strong>{t('stock.sellPriceLabel')}</strong> €{item.sellPrice.toFixed(2)}/{t('units.pricePerKg').replace('€/', '')}</p>
-                ) : (
-                  <p><strong>{t('stock.unitPriceLabel')}</strong> €{item.unitPrice.toFixed(2)}/{t('units.pricePerKg').replace('€/', '')}</p>
-                )}
-                {item.totalRevenue !== undefined ? (
-                  <p><strong>{t('stock.totalRevenueLabel')}</strong> €{item.totalRevenue.toFixed(2)}</p>
-                ) : (
-                  <p><strong>{t('stock.totalPriceLabel')}</strong> €{item.totalPrice.toFixed(2)}</p>
-                )}
-                <p><strong>{t('stock.collectedLabel')}</strong> {formatDate(item.collectedAt)}</p>
+                <p><strong>{t('buys.buyPriceLabel')}</strong> €{item.buyPrice.toFixed(2)}/{t('units.pricePerKg').replace('€/', '')}</p>
+                <p><strong>{t('buys.totalCostLabel')}</strong> €{item.totalCost.toFixed(2)}</p>
+                <p><strong>{t('buys.purchasedLabel')}</strong> {formatDate(item.purchasedAt)}</p>
                 {item.notes && <p><strong>{t('stock.notesLabel')}</strong> {item.notes}</p>}
               </div>
               
@@ -186,8 +203,8 @@ export const StockList: React.FC<StockListProps> = ({
                 <button 
                   className="btn btn-small btn-danger icon-with-text"
                   onClick={() => handleDelete(item.id)}
-                  aria-label={t('stock.deleteItem', { species: item.species })}
-                  title={t('stock.deleteItem', { species: item.species })}
+                  aria-label={t('buys.deleteItem', { species: item.species })}
+                  title={t('buys.deleteItem', { species: item.species })}
                 >
                   <Icon name="trash" size={14} aria-hidden="true" />
                   {t('common.delete')}
@@ -198,7 +215,7 @@ export const StockList: React.FC<StockListProps> = ({
         </div>
       )}
       
-      {stockItems.length > 0 && (
+      {buyItems.length > 0 && (
         <>
           <section 
             style={{ 
@@ -208,20 +225,26 @@ export const StockList: React.FC<StockListProps> = ({
               borderRadius: '6px',
               border: '1px solid #e2e8f0'
             }}
-            aria-labelledby="summary-heading"
+            aria-labelledby="buy-summary-heading"
           >
-            <h3 id="summary-heading" className="sr-only">{t('stock.summaryStatistics')}</h3>
+            <h3 id="buy-summary-heading" className="sr-only">{t('buys.summaryStatistics')}</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px', textAlign: 'center' }}>
               <div>
-                <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('stock.totalItems')}</p>
+                <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('buys.totalItems')}</p>
                 <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px', color: '#2d3748' }}>
-                  {stockItems.length}
+                  {buyItems.length}
                 </p>
               </div>
               <div>
-                <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('stock.totalRevenue')}</p>
-                <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px', color: '#065f46' }}>
-                  €{stockItems.reduce((total, item) => total + (item.totalRevenue || item.totalPrice || 0), 0).toFixed(2)}
+                <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('buys.totalCost')}</p>
+                <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px', color: '#dc2626' }}>
+                  €{buyItems.reduce((total, item) => total + item.totalCost, 0).toFixed(2)}
+                </p>
+              </div>
+              <div>
+                <p style={{ margin: 0, color: '#4a5568', fontSize: '14px' }}>{t('buys.totalQuantity')}</p>
+                <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px', color: '#2d3748' }}>
+                  {(buyItems.reduce((total, item) => total + item.quantity, 0)).toFixed(1)} {t('units.grams')}
                 </p>
               </div>
             </div>
@@ -229,9 +252,9 @@ export const StockList: React.FC<StockListProps> = ({
           <div style={{ marginTop: '15px', textAlign: 'center' }}>
             <button 
               className="btn btn-secondary btn-small icon-with-text" 
-              onClick={loadStockItems}
+              onClick={loadBuyItems}
               disabled={loading}
-              aria-label={t('stock.refreshStockList')}
+              aria-label={t('buys.refreshBuyList')}
             >
               <Icon name="refresh" size={14} aria-hidden="true" />
               {loading ? t('stock.refreshing') : t('stock.refresh')}

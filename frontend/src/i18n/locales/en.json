@@ -1,16 +1,19 @@
 {
   "app": {
-    "title": "Berries and Mushrooms Store",
+    "title": "Berries and Mushrooms Shop",
     "subtitle": "Track berry and mushroom sales with ease",
-    "welcome": "Welcome to Berry & Mushroom Store",
+    "welcome": "Welcome to Berry & Mushroom Shop",
     "welcomeDescription": "Prices and Sales pages allows to manage berry and mushroom sales after creating user account.",
     "mainContent": "Main application content"
   },
   "navigation": {
     "home": "Home",
     "collections": "Sales",
+    "buys": "Buys",
     "priceMonitoring": "Prices",
+    "balance": "Balance",
     "goToCollections": "Go to Sales",
+    "goToBuys": "Go to Buys",
     "goToHome": "Go to Home",
     "mainNavigation": "Main navigation",
     "accountActions": "Account actions"
@@ -93,6 +96,7 @@
     "showProfitBreakdown": "Show Profit Breakdown",
     "usePriceMonitoring": "Use prices from Price Monitoring (recommended)",
     "currentPrices": "Current prices",
+    "currentSellPrice": "Current sell price",
     "noPriceFound": "No price found for species. Add it in Prices page first or uncheck to enter manually.",
     "priceYear": "Year",
     "summaryStatistics": "Summary statistics",
@@ -168,7 +172,15 @@
     "yearRequired": "Year is required",
     "buyPriceRequired": "Buy price is required",
     "sellPriceRequired": "Sell price is required",
-    "confirmDeletePrice": "Are you sure you want to delete this price entry?"
+    "confirmDeletePrice": "Are you sure you want to delete this price entry?",
+    "buyFormFieldsRequired": "Species, quantity, and buy price are required. Notes are optional.",
+    "buyItemCreated": "Purchase recorded successfully!",
+    "errorCreatingBuy": "Error creating purchase",
+    "failedToLoadBuys": "Failed to load purchases",
+    "failedToDeleteBuy": "Failed to delete purchase",
+    "salesFormFieldsRequired": "Species, quantity, and sell price are required. Notes are optional.",
+    "noInventoryAvailable": "No inventory available for {{species}}. Please purchase this item first before trying to sell it.",
+    "insufficientInventory": "Insufficient inventory for {{species}}. You are trying to sell {{requested}}g but only have {{available}}g available."
   },
   "units": {
     "grams": "g",
@@ -216,6 +228,31 @@
     "speciesFilter": "Filter by Species",
     "allSpecies": "All Species"
   },
+  "buys": {
+    "addItem": "Add Purchase",
+    "yourPurchases": "Your Purchases",
+    "showingPurchasesFor": "Showing purchases for:",
+    "loadingPurchases": "Loading purchases...",
+    "noPurchasesYet": "No Purchases Yet",
+    "startAddingPurchases": "Start adding berry and mushroom purchases!",
+    "buyPriceRequired": "Buy Price (€/kg) *",
+    "buyPriceLabel": "Buy Price:",
+    "totalCostLabel": "Total Cost:",
+    "purchasedLabel": "Purchased:",
+    "confirmDelete": "Are you sure you want to delete this purchase?",
+    "deleteItem": "Delete this purchase",
+    "addingItemsFor": "Adding purchases for:",
+    "addBuyButton": "Add Purchase",
+    "usePriceMonitoring": "Use buy prices from Price Monitoring (recommended)",
+    "currentBuyPrice": "Current buy price",
+    "totalItems": "Total Items",
+    "totalCost": "Total Cost",
+    "totalQuantity": "Total Quantity",
+    "summaryStatistics": "Purchase summary statistics",
+    "buyItemsList": "List of purchased items",
+    "refreshBuyList": "Refresh the purchases list",
+    "selectUserToView": "Select a user to view purchase history"
+  },
   "userSalesTable": {
     "title": "User Sales Summary",
     "userName": "User",
@@ -228,5 +265,9 @@
     "allUsers": "All Users",
     "noSalesData": "No sales data available",
     "addCollectionsToSee": "Add collections to see user sales analysis"
+  },
+  "balance": {
+    "title": "Balance",
+    "subtitle": "Comprehensive profit analysis and market overview"
   }
 }

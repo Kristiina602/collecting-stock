@@ -6,7 +6,9 @@ import { CreateUserDialog } from './components/CreateUserDialog';
 import { LoginDialog } from './components/LoginDialog';
 import { HomePage } from './pages/HomePage';
 import { CollectionsPage } from './pages/CollectionsPage';
+import { BuysPage } from './pages/BuysPage';
 import { PriceMonitoringPage } from './pages/PriceMonitoringPage';
+import { BalancePage } from './pages/BalancePage';
 import { User } from './types';
 import './App.css';
 
@@ -72,6 +74,13 @@ const AppContent: React.FC = () => {
             {t('navigation.home')}
           </Link>
           <Link 
+            to="/buys" 
+            className={`nav-link ${location.pathname === '/buys' ? 'active' : ''}`}
+            aria-current={location.pathname === '/buys' ? 'page' : undefined}
+          >
+            {t('navigation.buys')}
+          </Link>
+          <Link 
             to="/collections" 
             className={`nav-link ${location.pathname === '/collections' ? 'active' : ''}`}
             aria-current={location.pathname === '/collections' ? 'page' : undefined}
@@ -84,6 +93,13 @@ const AppContent: React.FC = () => {
             aria-current={location.pathname === '/price-monitoring' ? 'page' : undefined}
           >
             {t('navigation.priceMonitoring')}
+          </Link>
+          <Link 
+            to="/balance" 
+            className={`nav-link ${location.pathname === '/balance' ? 'active' : ''}`}
+            aria-current={location.pathname === '/balance' ? 'page' : undefined}
+          >
+            {t('navigation.balance')}
           </Link>
           {location.pathname === '/' && (
             <div className="nav-links-right" role="group" aria-label={t('navigation.accountActions')}>
@@ -119,8 +135,16 @@ const AppContent: React.FC = () => {
             element={<CollectionsPage preSelectedUser={newlyCreatedUser || loggedInUser} />} 
           />
           <Route 
+            path="/buys" 
+            element={<BuysPage preSelectedUser={newlyCreatedUser || loggedInUser} />} 
+          />
+          <Route 
             path="/price-monitoring" 
             element={<PriceMonitoringPage />} 
+          />
+          <Route 
+            path="/balance" 
+            element={<BalancePage />} 
           />
         </Routes>
       </main>

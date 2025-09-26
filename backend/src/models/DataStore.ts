@@ -49,6 +49,12 @@ class DataStore {
     let sellPrice = stockItemData.sellPrice || stockItemData.unitPrice || 0;
     let unitPrice = stockItemData.unitPrice || sellPrice; // Keep unitPrice for backward compatibility
     
+    // Data consistency validation
+    if (sellPrice > 0 && buyPrice === 0 && !stockItemData.unitPrice) {
+      // This shouldn't happen with proper API usage
+      console.warn('Creating item with sellPrice > 0 but buyPrice = 0 and no unitPrice. This may cause data inconsistency.');
+    }
+    
     // Calculate all price-related fields (prices are in €/kg, quantity in grams)
     const totalRevenue = (stockItemData.quantity * sellPrice) / 1000;
     const totalCost = (stockItemData.quantity * buyPrice) / 1000;
@@ -117,6 +123,10 @@ class DataStore {
   getUserProfitByYear(userId: string, typeFilter?: 'berry' | 'mushroom'): Record<number, { revenue: number; cost: number; profit: number; itemCount: number }> {
     let userItems = this.stockItems.filter(item => item.userId === userId);
     
+    // Filter for sales only (both sellPrice > 0 AND buyPrice > 0, which means it's a proper sale transaction)
+    // Items with only sellPrice but no buyPrice are legacy collection items, not sales
+    userItems = userItems.filter(item => item.sellPrice > 0 && item.buyPrice > 0);
+    
     // Apply type filter if provided
     if (typeFilter) {
       userItems = userItems.filter(item => item.type === typeFilter);
@@ -130,9 +140,15 @@ class DataStore {
         yearlyData[year] = { revenue: 0, cost: 0, profit: 0, itemCount: 0 };
       }
       
-      yearlyData[year].revenue += item.totalRevenue || item.totalPrice || 0;
-      yearlyData[year].cost += item.totalCost || 0;
-      yearlyData[year].profit += item.totalProfit || (item.totalRevenue || item.totalPrice || 0);
+      // Use the calculated values, with proper fallback
+      const revenue = item.totalRevenue || item.totalPrice || 0;
+      const cost = item.totalCost || 0;
+      // Fix: Use the actual totalProfit if available, otherwise calculate it properly
+      const profit = item.totalProfit !== undefined ? item.totalProfit : (revenue - cost);
+      
+      yearlyData[year].revenue += revenue;
+      yearlyData[year].cost += cost;
+      yearlyData[year].profit += profit;
       yearlyData[year].itemCount += 1;
     });
     
@@ -314,6 +330,93 @@ class DataStore {
     });
 
     return result;
+  }
+
+  // Get available inventory (purchased quantity - sold quantity) for a user
+  getAvailableInventory(
+    userId: string, 
+    typeFilter?: 'berry' | 'mushroom', 
+    speciesFilter?: string
+  ): Array<{ type: 'berry' | 'mushroom'; species: string; availableQuantity: number; totalPurchased: number; totalSold: number; }> {
+    let userItems = this.stockItems.filter(item => item.userId === userId);
+    
+    // Apply type filter if provided
+    if (typeFilter) {
+      userItems = userItems.filter(item => item.type === typeFilter);
+    }
+    
+    // Apply species filter if provided
+    if (speciesFilter) {
+      userItems = userItems.filter(item => item.species === speciesFilter);
+    }
+
+    // Group items by type and species
+    const inventoryMap = new Map<string, { 
+      type: 'berry' | 'mushroom'; 
+      species: string; 
+      totalPurchased: number; 
+      totalSold: number; 
+    }>();
+
+    userItems.forEach(item => {
+      const key = `${item.type}:${item.species}`;
+      
+      if (!inventoryMap.has(key)) {
+        inventoryMap.set(key, {
+          type: item.type,
+          species: item.species,
+          totalPurchased: 0,
+          totalSold: 0
+        });
+      }
+      
+      const inventory = inventoryMap.get(key)!;
+      
+      // If buyPrice > 0 and sellPrice = 0, it's a purchase
+      if (item.buyPrice > 0 && item.sellPrice === 0) {
+        inventory.totalPurchased += item.quantity;
+      }
+      // If sellPrice > 0, it's a sale (regardless of buyPrice)
+      else if (item.sellPrice > 0) {
+        inventory.totalSold += item.quantity;
+      }
+    });
+
+    // Convert to array and calculate available quantity
+    return Array.from(inventoryMap.values()).map(inventory => ({
+      ...inventory,
+      availableQuantity: inventory.totalPurchased - inventory.totalSold
+    }));
+  }
+
+  // Data integrity methods
+  validateDataIntegrity(): { inconsistentItems: StockItem[]; warnings: string[] } {
+    const inconsistentItems: StockItem[] = [];
+    const warnings: string[] = [];
+
+    this.stockItems.forEach(item => {
+      // Check for items that might be incorrectly categorized
+      if (item.sellPrice > 0 && item.buyPrice === 0) {
+        inconsistentItems.push(item);
+        warnings.push(`Item ${item.id}: Has sellPrice (${item.sellPrice}) but no buyPrice. This might appear in sales when it shouldn't.`);
+      }
+      
+      // Check for items that have both prices but inconsistent calculations
+      if (item.sellPrice > 0 && item.buyPrice > 0) {
+        const expectedRevenue = (item.quantity * item.sellPrice) / 1000;
+        const expectedCost = (item.quantity * item.buyPrice) / 1000;
+        const expectedProfit = expectedRevenue - expectedCost;
+        
+        if (Math.abs(item.totalRevenue - expectedRevenue) > 0.01 ||
+            Math.abs(item.totalCost - expectedCost) > 0.01 ||
+            Math.abs(item.totalProfit - expectedProfit) > 0.01) {
+          inconsistentItems.push(item);
+          warnings.push(`Item ${item.id}: Calculated values don't match stored values.`);
+        }
+      }
+    });
+
+    return { inconsistentItems, warnings };
   }
 }
 

@@ -112,6 +112,19 @@ export const stockApi = {
     }
     return response.data.data;
   },
+
+  // Get available inventory for a user
+  getAvailableInventory: async (userId: string, type?: 'berry' | 'mushroom', species?: string): Promise<Array<{ type: 'berry' | 'mushroom'; species: string; availableQuantity: number; totalPurchased: number; totalSold: number; }>> => {
+    const params: any = {};
+    if (type) params.type = type;
+    if (species) params.species = species;
+    
+    const response = await api.get<ApiResponse<Array<{ type: 'berry' | 'mushroom'; species: string; availableQuantity: number; totalPurchased: number; totalSold: number; }>>>(`/stock/inventory/${userId}`, { params });
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || 'Failed to fetch inventory');
+    }
+    return response.data.data;
+  },
 };
 
 // Price API

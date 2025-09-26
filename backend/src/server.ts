@@ -7,6 +7,7 @@ import userRoutes from './routes/userRoutes';
 import stockRoutes from './routes/stockRoutes';
 import priceRoutes from './routes/priceRoutes';
 import { errorHandler } from './middleware/errorHandler';
+import { createBuyItem, getBuyItems, deleteBuyItem } from './controllers/stockController';
 
 // Load environment variables
 dotenv.config();
@@ -36,6 +37,11 @@ app.get('/health', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/stock', stockRoutes);
 app.use('/api/prices', priceRoutes);
+
+// Buy items endpoints
+app.post('/api/buy-items', createBuyItem);
+app.get('/api/buy-items', getBuyItems);
+app.delete('/api/buy-items/:id', deleteBuyItem);
 
 // 404 handler
 app.use('*', (req, res) => {
